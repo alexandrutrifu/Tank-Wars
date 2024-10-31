@@ -1,0 +1,55 @@
+#include "terrain.h"
+
+#include <vector>
+
+#include "core/engine.h"
+#include "components/simple_scene.h"
+
+
+Mesh* terrain::CreateSquare(
+    const std::string &name,
+    glm::vec3 leftBottomCorner,
+    float length,
+    glm::vec3 color,
+    bool fill)
+{
+    glm::vec3 corner = leftBottomCorner;
+
+    std::vector<VertexFormat> vertices =
+    {
+        VertexFormat(corner, color),
+        VertexFormat(corner + glm::vec3(length, 0, 0), color),
+        VertexFormat(corner + glm::vec3(length, length, 0), color),
+        VertexFormat(corner + glm::vec3(0, length, 0), color)
+    };
+
+    Mesh* square = new Mesh(name);
+    std::vector<unsigned int> indices = { 0, 1, 2, 3 };
+
+    if (!fill) {
+        square->SetDrawMode(GL_LINE_LOOP);
+    } else {
+        // Draw 2 triangles. Add the remaining 2 indices
+        indices.push_back(0);
+        indices.push_back(2);
+    }
+
+    square->InitFromData(vertices, indices);
+    return square;
+}
+
+float getTerrainY(float x) {
+    return cos(2 * x + 1) - cos(1.5 * x + 1.5) +
+         0.2 * sin(3.4 * x + 1) + 2 + x / 20 + sin(0.4 * x);
+}
+
+std::vector<glm::vec3> initializeTerrain(glm::ivec2 resolution) {
+	std::vector<glm::vec3> terrainCoordinates;
+
+    for (int xCoordinate = 0; xCoordinate < resolution.x; xCoordinate += 10) {
+        float yCoordinate = getTerrainY(xCoordinate);
+        terrainCoordinates.push_back(glm::vec3(xCoordinate, yCoordinate, 0));
+    }
+
+    return terrainCoordinates;
+}

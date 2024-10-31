@@ -33,6 +33,15 @@ namespace transform
                       sin(radians), cos(radians), 0,
                       0, 0, 1));
     }
+
+    // Shear matrix
+    inline glm::mat3 ShearOY(float shearY)
+    {
+        return glm::transpose(
+            glm::mat3(1, 0, 0,
+                      shearY, 1, 0,
+                      0, 0, 1));
+    }
 }
 
 #endif // TRANSFORM_H

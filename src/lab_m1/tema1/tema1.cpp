@@ -31,12 +31,10 @@ void Tema1::Init()
     glm::vec3 corner = glm::vec3(0, 0, 0);
     float squareSide = 500;
 
-    // Define terrain coordinate array
-    std::vector<glm::vec3> terrainCoordinates = terrain::initializeTerrain(resolution);
+    // Initialize terrain
+    terrain::Terrain terrain;
 
-
-    Mesh* square1 = terrain::CreateSquare("square1", corner, squareSide, glm::vec3(1, 0, 0), true);
-    AddMeshToList(square1);
+    terrain.initializeTerrain(resolution);
 }
 
 

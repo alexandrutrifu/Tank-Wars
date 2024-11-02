@@ -50,7 +50,8 @@ void Tema1::Init()
 
     // Initialize tank model
     tanks::Tank tank = tanks::Tank::CreateTankModel("tank", corner);
-
+    
+    tank.setTurretAngle(glm::radians(30.0f));
     tanks.push_back(tank);
 
     for (auto &tankPart : tank.getTankParts()) {
@@ -101,10 +102,10 @@ void Tema1::Update(float deltaTimeSeconds)
     // Render tanks
     for (auto &tank : tanks) {
         for (auto &tankPart : tank.getTankParts()) {
-            modelMatrix = glm::mat3(1);
-            modelMatrix *= transform::Translate(1000, 500);
+            modelMatrix = tank.getRenderMatrix(tankPart, tank.getTurretAngle());
 
             RenderMesh2D(tankPart, shaders["VertexColor"], modelMatrix);
+            glClear(GL_DEPTH_BUFFER_BIT);
         }
     }
 

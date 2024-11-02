@@ -15,6 +15,7 @@
 #include "components/simple_scene.h"
 #include "utils/glm_utils.h"
 
+#define DISK_VERTEX_COUNT 100
 
 namespace objects {
     // Create square with given bottom left corner, length and color
@@ -22,7 +23,11 @@ namespace objects {
                 float length, glm::vec3 color, bool fill = false);
     
     // Create disk with given radius, vertex count, bottom left corner and color
-    Mesh *CreateDisk(const std::string &name, float radius, float vertexCount,
+    Mesh *CreateDisk(const std::string &name, float radius, int vertexCount,
+                glm::vec3 leftBottomCorner, glm::vec3 color, bool fill);
+
+    // Create disk half with given radius, vertex count, bottom left corner and color
+    Mesh *CreateDiskHalf(const std::string &name, float radius, int vertexCount,
                 glm::vec3 leftBottomCorner, glm::vec3 color, bool fill);
 
     // Create trapezoid with given bottom left corner, length, height and color

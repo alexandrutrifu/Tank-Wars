@@ -48,7 +48,7 @@ namespace m1
 
         std::vector<glm::vec3> terrainCoordinates{};
 
-        std::vector<tanks::Tank> tanks{};
+        std::vector<tanks::Tank *> tanks{};
 
     };
 }   // namespace m1

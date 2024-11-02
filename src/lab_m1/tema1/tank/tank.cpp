@@ -9,8 +9,8 @@ tanks::Tank::Tank() = default;
 
 tanks::Tank::~Tank() = default;
 
-tanks::Tank tanks::Tank::CreateTankModel(const std::string &name, glm::vec3 leftBottomCorner) {
-    tanks::Tank tank{};
+tanks::Tank *tanks::Tank::CreateTankModel(const std::string &name, glm::vec3 leftBottomCorner) {
+    tanks::Tank *tank = new tanks::Tank();
 
     // Create tank base
     Mesh *tankBase = objects::CreateTrapezoid(name + "_base", leftBottomCorner,
@@ -31,10 +31,10 @@ tanks::Tank tanks::Tank::CreateTankModel(const std::string &name, glm::vec3 left
                 TANK_TURRET_HEIGHT, tank_turret_colour, true);
 
     // Add tank parts to object vector (in the order they should be rendered)
-    tank.tankParts.push_back(tankTurret);
-    tank.tankParts.push_back(tankBase);
-    tank.tankParts.push_back(tankBody);
-    tank.tankParts.push_back(tankDome);
+    tank->tankParts.push_back(tankTurret);
+    tank->tankParts.push_back(tankBase);
+    tank->tankParts.push_back(tankBody);
+    tank->tankParts.push_back(tankDome);
 
     return tank;
 }

@@ -49,12 +49,12 @@ void Tema1::Init()
     // AddMeshToList(trapezoid);
 
     // Initialize tank model
-    tanks::Tank tank = tanks::Tank::CreateTankModel("tank", corner);
+    tanks::Tank *tank = tanks::Tank::CreateTankModel("tank", corner);
     
-    tank.setTurretAngle(glm::radians(30.0f));
+    tank->setTurretAngle(glm::radians(30.0f));
     tanks.push_back(tank);
 
-    for (auto &tankPart : tank.getTankParts()) {
+    for (auto &tankPart : tank->getTankParts()) {
         AddMeshToList(tankPart);
     }
 }
@@ -63,6 +63,8 @@ void Tema1::Init()
 void Tema1::FrameStart()
 {
     // Clears the color buffer (using the previously set color) and depth buffer
+    glEnable(GL_DEPTH_TEST);
+    glDepthFunc(GL_LESS);
     glClearColor(0, 0, 0, 1);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -101,8 +103,8 @@ void Tema1::Update(float deltaTimeSeconds)
 
     // Render tanks
     for (auto &tank : tanks) {
-        for (auto &tankPart : tank.getTankParts()) {
-            modelMatrix = tank.getRenderMatrix(tankPart, tank.getTurretAngle());
+        for (auto &tankPart : tank->getTankParts()) {
+            modelMatrix = tank->getRenderMatrix(tankPart, tank->getTurretAngle());
 
             RenderMesh2D(tankPart, shaders["VertexColor"], modelMatrix);
             glClear(GL_DEPTH_BUFFER_BIT);

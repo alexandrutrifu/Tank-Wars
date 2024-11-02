@@ -41,7 +41,7 @@ namespace tanks {
             ~Tank();
 
             // Returns a vector of meshes that form the tank model
-            static tanks::Tank CreateTankModel(const std::string &name, glm::vec3 leftBottomCorner);
+            static tanks::Tank *CreateTankModel(const std::string &name, glm::vec3 leftBottomCorner);
 
             // Builds Render Matrix
             static glm::mat3 getRenderMatrix(Mesh *tankPart, float turretAngle);

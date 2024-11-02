@@ -51,6 +51,7 @@ void Tema1::Init()
     // Initialize tank model
     tanks::Tank *tank = tanks::Tank::CreateTankModel("tank", corner);
     
+    tank->setCenterPosition(1000, 500);
     tank->setTurretAngle(glm::radians(30.0f));
     tanks.push_back(tank);
 
@@ -138,6 +139,39 @@ void Tema1::FrameEnd()
 
 void Tema1::OnInputUpdate(float deltaTime, int mods)
 {
+    if (window->KeyHold(GLFW_KEY_W)) {
+        // Rotate turret -> left
+        tanks::Tank *tank = tanks[0];
+
+        if (tank->getTurretAngle() < glm::radians(150.0f)) {
+            tank->setTurretAngle(tank->getTurretAngle() + deltaTime);
+        }
+    }
+
+    if (window->KeyHold(GLFW_KEY_S)) {
+        // Rotate turret -> right
+        tanks::Tank *tank = tanks[0];
+
+        if (tank->getTurretAngle() > glm::radians(30.0f)) {
+            tank->setTurretAngle(tank->getTurretAngle() - deltaTime);
+        }
+    }
+
+    if (window->KeyHold(GLFW_KEY_A)) {
+        // Move tank -> left
+        tanks::Tank *tank = tanks[0];
+        glm::vec2 centerPosition = tank->getCenterPosition();
+
+        tank->setCenterPosition(centerPosition.x - 100 * deltaTime, centerPosition.y);
+    }
+
+    if (window->KeyHold(GLFW_KEY_D)) {
+        // Move tank -> right
+        tanks::Tank *tank = tanks[0];
+        glm::vec2 centerPosition = tank->getCenterPosition();
+
+        tank->setCenterPosition(centerPosition.x + 100 * deltaTime, centerPosition.y);
+    }
 }
 
 

@@ -13,3 +13,5 @@
 #include "lab_m1/tema1/tema1.h"
 #include "lab_m1/tema1/transform.h"
 #include "lab_m1/tema1/terrain.h"
+#include "lab_m1/tema1/objects/objects.h"
+#include "lab_m1/tema1/tank/tank.h"

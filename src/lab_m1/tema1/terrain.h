@@ -3,8 +3,14 @@
 
 #pragma once
 
-#include <string>
+#include "transform.h"
+#include "math.h"
 
+#include <vector>
+#include <string>
+#include <iostream>
+
+#include "core/engine.h"
 #include "core/gpu/mesh.h"
 #include "components/simple_scene.h"
 #include "utils/glm_utils.h"
@@ -17,12 +23,9 @@ namespace terrain
             Terrain();
             ~Terrain() override;
 
-            // Create square with given bottom left corner, length and color
-            Mesh *CreateSquare(const std::string &name, glm::vec3 leftBottomCorner,
-                            float length, glm::vec3 color, bool fill = false);
-
             // Render a terrain square
-            void renderTerrainSquare(int index, glm::vec3 pointA, glm::vec3 pointB, glm::vec3 corner);
+            void initializeSingularSquare(int index, glm::vec3 pointA, glm::vec3 pointB,
+                            std::unordered_map<std::string, Mesh *> &meshes);
 
             // Get the y coordinate of the terrain at a given x coordinate
             float getTerrainY(float x);
@@ -31,7 +34,17 @@ namespace terrain
             std::vector<glm::vec3> getTerrainCoordinates(glm::ivec2 resolution);
 
             // Initialize terrain
-            void initializeTerrain(glm::ivec2 resolution);
+            void initializeTerrain(glm::ivec2 resolution,
+                    std::unordered_map<std::string, Mesh *> &meshes);
+
+            // Render a terrain square
+            void renderTerrainSquare(int index, glm::vec3 pointA, glm::vec3 pointB,
+                            std::unordered_map<std::string, Mesh *> &meshes);
+
+            // Render the terrain
+            void renderTerrain(std::unordered_map<std::string, Mesh *> &meshes);
+
+            std::vector<glm::vec3> terrainCoordinates;
 
         protected:
             glm::mat3 modelMatrix{};

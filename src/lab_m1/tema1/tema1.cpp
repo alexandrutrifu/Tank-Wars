@@ -5,6 +5,7 @@
 
 #include "lab_m1/tema1/transform.h"
 #include "lab_m1/tema1/terrain.h"
+#include "lab_m1/tema1/objects/objects.h"
 
 using namespace std;
 using namespace m1;
@@ -13,10 +14,8 @@ using namespace m1;
 Tema1::Tema1()
 = default;
 
-
 Tema1::~Tema1()
 = default;
-
 
 void Tema1::Init()
 {
@@ -28,13 +27,23 @@ void Tema1::Init()
     camera->Update();
     GetCameraInput()->SetActive(false);
 
-    glm::vec3 corner = glm::vec3(0, 0, 0);
-    float squareSide = 500;
-
     // Initialize terrain
-    terrain::Terrain terrain;
+    terrainCoordinates = terrain.getTerrainCoordinates(resolution);
 
-    terrain.initializeTerrain(resolution);
+    for (int startIndex = 0; startIndex < terrainCoordinates.size() - 1; startIndex++) {
+        glm::vec3 pointA = terrainCoordinates[startIndex];
+        glm::vec3 pointB = terrainCoordinates[startIndex + 1];
+        glm::vec3 corner = glm::vec3(0, -1, 0);
+
+        // Create standard square
+        Mesh* square = objects::CreateSquare("square" + std::to_string(startIndex), corner, 1, glm::vec3(1, 0, 0), true);
+        
+        AddMeshToList(square);
+    }
+
+    // Disk
+    Mesh* disk = objects::CreateDisk("disk", 400, 100, glm::vec3(0, -1, 0), glm::vec3(1, 1, 0), true);
+    AddMeshToList(disk);
 }
 
 
@@ -52,62 +61,34 @@ void Tema1::FrameStart()
 
 void Tema1::Update(float deltaTimeSeconds)
 {
-    // TODO(student): Update steps for translation, rotation and scale,
-    // in order to create animations. Use the class variables in the
-    // class header, and if you need more of them to complete the task,
-    // add them over there!
+    // Render terrain
+    for (int startIndex = 0; startIndex < terrainCoordinates.size() - 1; startIndex++) {
+        glm::vec3 pointA = terrainCoordinates[startIndex];
+        glm::vec3 pointB = terrainCoordinates[startIndex + 1];
 
-    modelMatrix = glm::mat3(1);
-    modelMatrix *= transform::Translate(150, 250);
-    // TODO(student): Create animations by multiplying the current
-    // transform matrix with the matrices you just implemented.
-    // Remember, the last matrix in the chain will take effect first!
-    translateX += deltaTimeSeconds * 100;
-    translateY += deltaTimeSeconds * 100;
-    modelMatrix *= transform::Translate(translateX, translateY);
+        modelMatrix = glm::mat3(1);
 
-    RenderMesh2D(meshes["square1"], shaders["VertexColor"], modelMatrix);
+        // (1) Translation
+        modelMatrix *= transform::Translate(pointA.x, pointA.y);
 
-    modelMatrix = glm::mat3(1);
-    modelMatrix *= transform::Translate(400, 250);
-    // TODO(student): Create animations by multiplying the current
-    // transform matrix with the matrices you just implemented
-    // Remember, the last matrix in the chain will take effect first!
-    scaleX += deltaTimeSeconds * 0.3f;
-    scaleY += deltaTimeSeconds * 0.3f;
-    modelMatrix *= transform::Translate(cx, cy);
-    modelMatrix *= transform::Scale(scaleX, scaleY);
-    modelMatrix *= transform::Translate(-cx, -cy);
+        // (2) Shearing
+        float shearY = (pointB.y - pointA.y) / (pointB.x - pointA.x);
+        modelMatrix *= transform::ShearOY(shearY);
 
-    RenderMesh2D(meshes["square2"], shaders["VertexColor"], modelMatrix);
+        float segmentHeight = max(pointA.y, pointB.y);
+        float segmentWidth = pointB.x - pointA.x;
 
-    modelMatrix = glm::mat3(1);
-    modelMatrix *= transform::Translate(650, 250);
-    // TODO(student): Create animations by multiplying the current
-    // transform matrix with the matrices you just implemented
-    // Remember, the last matrix in the chain will take effect first!
-    angularStep += deltaTimeSeconds * 1.56f;
-    modelMatrix *= transform::Translate(cx, cy);
-    modelMatrix *= transform::Rotate(angularStep);
-    modelMatrix *= transform::Translate(-cx, -cy);
+        // (3) Scaling
+        modelMatrix *= transform::Scale(segmentWidth, segmentHeight);
 
-    RenderMesh2D(meshes["square3"], shaders["VertexColor"], modelMatrix);
+        RenderMesh2D(meshes["square" + std::to_string(startIndex)], shaders["VertexColor"], modelMatrix);
+    }
 
-    /* BONUS */
-
-    modelMatrix = glm::mat3(1);
-    modelMatrix *= transform::Translate(800, 250);
-    // TODO(student): Create animations by multiplying the current
-    // transform matrix with the matrices you just implemented
-    // Remember, the last matrix in the chain will take effect first!
-    scaleCar1 = 2;
-    scaleCar2 = 1;
-
-    // modelMatrix *= transform2D::Translate(cx, cy);
-    modelMatrix *= transform::Scale(scaleCar1, scaleCar2);
-    // modelMatrix *= transform2D::Translate(-cx, -cy);
-
-    RenderMesh2D(meshes["rectangle1"], shaders["VertexColor"], modelMatrix);
+    // Render disk
+    // glClear(GL_DEPTH_BUFFER_BIT);
+    // modelMatrix = glm::mat3(1);
+    // modelMatrix *= transform::Translate(1000, 500);
+    // RenderMesh2D(meshes["disk"], shaders["VertexColor"], modelMatrix);
 }
 
 

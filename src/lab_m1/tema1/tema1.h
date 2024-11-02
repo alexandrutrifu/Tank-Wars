@@ -4,6 +4,7 @@
 #pragma once
 
 #include "components/simple_scene.h"
+#include "lab_m1/tema1/terrain.h"
 
 namespace m1
 {
@@ -30,12 +31,15 @@ namespace m1
         void OnWindowResize(int width, int height) override;
 
     protected:
+        terrain::Terrain terrain{};
         float cx{}, cy{};
         glm::mat3 modelMatrix{};
         float translateX{}, translateY{};
         float scaleX{}, scaleY{};
         float scaleCar1{}, scaleCar2{};
         float angularStep{};
+
+        std::vector<glm::vec3> terrainCoordinates{};
 
     };
 }   // namespace m1

@@ -1,12 +1,5 @@
 #include "lab_m1/tema1/tema1.h"
 
-#include <vector>
-#include <iostream>
-
-#include "lab_m1/tema1/transform.h"
-#include "lab_m1/tema1/terrain.h"
-#include "lab_m1/tema1/objects/objects.h"
-
 using namespace std;
 using namespace m1;
 
@@ -27,13 +20,15 @@ void Tema1::Init()
     camera->Update();
     GetCameraInput()->SetActive(false);
 
+    // Left bottom corner
+    glm::vec3 corner = glm::vec3(0, -1, 0);
+
     // Initialize terrain
     terrainCoordinates = terrain.getTerrainCoordinates(resolution);
 
     for (int startIndex = 0; startIndex < terrainCoordinates.size() - 1; startIndex++) {
         glm::vec3 pointA = terrainCoordinates[startIndex];
         glm::vec3 pointB = terrainCoordinates[startIndex + 1];
-        glm::vec3 corner = glm::vec3(0, -1, 0);
 
         // Create standard square
         Mesh* square = objects::CreateSquare("square" + std::to_string(startIndex), corner, 1, glm::vec3(1, 0, 0), true);
@@ -41,9 +36,26 @@ void Tema1::Init()
         AddMeshToList(square);
     }
 
-    // Disk
-    Mesh* disk = objects::CreateDisk("disk", 400, 100, glm::vec3(0, -1, 0), glm::vec3(1, 1, 0), true);
-    AddMeshToList(disk);
+    // // Disk
+    // Mesh* disk = objects::CreateDisk("disk", 400, 100, glm::vec3(0, -1, 0), glm::vec3(1, 1, 0), true);
+    // AddMeshToList(disk);
+
+    // // Half disk
+    // Mesh* halfDisk = objects::CreateDiskHalf("halfDisk", 400, 360, glm::vec3(0, -1, 0), glm::vec3(1, 1, 0), true);
+    // AddMeshToList(halfDisk);
+
+    // // Trapezoid
+    // Mesh* trapezoid = objects::CreateTrapezoid("trapezoid", glm::vec3(0, -1, 0), 400, 70, glm::vec3(0.796, 0.686, 0.533), true);
+    // AddMeshToList(trapezoid);
+
+    // Initialize tank model
+    tanks::Tank tank = tanks::Tank::CreateTankModel("tank", corner);
+
+    tanks.push_back(tank);
+
+    for (auto &tankPart : tank.getTankParts()) {
+        AddMeshToList(tankPart);
+    }
 }
 
 
@@ -84,11 +96,35 @@ void Tema1::Update(float deltaTimeSeconds)
         RenderMesh2D(meshes["square" + std::to_string(startIndex)], shaders["VertexColor"], modelMatrix);
     }
 
+    glClear(GL_DEPTH_BUFFER_BIT);
+
+    // Render tanks
+    for (auto &tank : tanks) {
+        for (auto &tankPart : tank.getTankParts()) {
+            modelMatrix = glm::mat3(1);
+            modelMatrix *= transform::Translate(1000, 500);
+
+            RenderMesh2D(tankPart, shaders["VertexColor"], modelMatrix);
+        }
+    }
+
     // Render disk
     // glClear(GL_DEPTH_BUFFER_BIT);
     // modelMatrix = glm::mat3(1);
     // modelMatrix *= transform::Translate(1000, 500);
     // RenderMesh2D(meshes["disk"], shaders["VertexColor"], modelMatrix);
+
+    // Render trapezoid
+    // glClear(GL_DEPTH_BUFFER_BIT);
+    // modelMatrix = glm::mat3(1);
+    // modelMatrix *= transform::Translate(1000, 500);
+    // RenderMesh2D(meshes["trapezoid"], shaders["VertexColor"], modelMatrix);
+
+    // Render half disk
+    // glClear(GL_DEPTH_BUFFER_BIT);
+    // modelMatrix = glm::mat3(1);
+    // modelMatrix *= transform::Translate(1000, 500);
+    // RenderMesh2D(meshes["halfDisk"], shaders["VertexColor"], modelMatrix);
 }
 
 

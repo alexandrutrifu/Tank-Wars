@@ -4,7 +4,14 @@
 #pragma once
 
 #include "components/simple_scene.h"
+
+#include <vector>
+#include <iostream>
+
+#include "lab_m1/tema1/transform.h"
 #include "lab_m1/tema1/terrain.h"
+#include "lab_m1/tema1/objects/objects.h"
+#include "lab_m1/tema1/tank/tank.h"
 
 namespace m1
 {
@@ -40,6 +47,8 @@ namespace m1
         float angularStep{};
 
         std::vector<glm::vec3> terrainCoordinates{};
+
+        std::vector<tanks::Tank> tanks{};
 
     };
 }   // namespace m1

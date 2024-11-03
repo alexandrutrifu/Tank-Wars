@@ -24,6 +24,7 @@ void Tema1::Init()
     glm::vec3 corner = glm::vec3(0, -1, 0);
 
     // Initialize terrain
+    // TODO : refactor class and make methods return mesh array
     terrainCoordinates = terrain.getTerrainCoordinates(resolution);
 
     for (int startIndex = 0; startIndex < terrainCoordinates.size() - 1; startIndex++) {
@@ -91,14 +92,12 @@ void Tema1::Update(float deltaTimeSeconds)
 
     glClear(GL_DEPTH_BUFFER_BIT);
 
-    // Update tank rendering
+    // Tank rendering
     for (auto &tank : tanks) {
-        cout << "Tank center position: " << tank->getCenterPosition().x << " " << tank->getCenterPosition().y << endl;
-        cout << "Tank turret position: " << tank->getTurretPosition().x << " " << tank->getTurretPosition().y << endl;
         for (auto &tankPart : tank->getTankParts()) {
             glm::mat3 modelMatrix = glm::mat3(1);
 
-            modelMatrix *= tank->getRenderMatrix(tankPart, tank->getTurretAngle());
+            modelMatrix *= tank->getRenderMatrix(tankPart, tank->getTurretAngle(), terrainCoordinates);
 
             RenderMesh2D(tankPart, shaders["VertexColor"], modelMatrix);
             glClear(GL_DEPTH_BUFFER_BIT);

@@ -5,6 +5,7 @@
 
 #include "../transform.h"
 #include "../objects/objects.h"
+#include "../terrain.h"
 #include "math.h"
 
 #include <vector>
@@ -26,14 +27,14 @@ namespace tanks {
             // Returns a vector of meshes that form the tank model
             static tanks::Tank *CreateTankModel(const std::string &name, glm::vec3 leftBottomCorner);
 
-            // Places tank at initial position
-            glm::mat3 placeTankAtInitialPosition(Mesh *tankPart);
-
             // Builds Render Matrix
-            glm::mat3 getRenderMatrix(Mesh *tankPart, float turretAngle);
+            glm::mat3 getRenderMatrix(Mesh *tankPart, float turretAngle, std::vector<glm::vec3> terrainCoordinates);
 
             // Get the tank parts
             std::vector<Mesh *> getTankParts() const;
+
+            // Get the tank y position
+            float getTankY(std::vector<glm::vec3> terrainCoordinates, int terrainSegmentIndex);
 
             float getTurretAngle() const;
             void setTurretAngle(float angle);

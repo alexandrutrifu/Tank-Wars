@@ -15,6 +15,8 @@
 #include "components/simple_scene.h"
 #include "utils/glm_utils.h"
 
+#define SEGMENT_SIZE 10
+
 
 namespace terrain
 {
@@ -28,7 +30,7 @@ namespace terrain
                             std::unordered_map<std::string, Mesh *> &meshes);
 
             // Get the y coordinate of the terrain at a given x coordinate
-            float getTerrainY(float x);
+            static float getTerrainY(float x);
 
             // Initialize the terrain coordinates array
             std::vector<glm::vec3> getTerrainCoordinates(glm::ivec2 resolution);
@@ -43,6 +45,10 @@ namespace terrain
 
             // Render the terrain
             void renderTerrain(std::unordered_map<std::string, Mesh *> &meshes);
+
+            static int getTerrainSegmentIndex(float x);
+
+            static float getSlope(std::vector<glm::vec3> terrainCoordinates, int terrainSegmentIndex);
 
             std::vector<glm::vec3> terrainCoordinates;
 

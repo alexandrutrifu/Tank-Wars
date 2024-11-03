@@ -90,3 +90,12 @@ void Terrain::renderTerrain(std::unordered_map<std::string, Mesh *> &meshes) {
         renderTerrainSquare(startIndex, pointA, pointB, meshes);
     }
 }
+
+int terrain::Terrain::getTerrainSegmentIndex(float x) {
+    return floor(x / SEGMENT_SIZE); 
+}
+
+float terrain::Terrain::getSlope(std::vector<glm::vec3> terrainCoordinates, int terrainSegmentIndex) {
+    return (terrainCoordinates[terrainSegmentIndex + 1].y - terrainCoordinates[terrainSegmentIndex].y) /
+            (terrainCoordinates[terrainSegmentIndex + 1].x - terrainCoordinates[terrainSegmentIndex].x);
+}

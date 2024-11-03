@@ -21,14 +21,25 @@ tanks::Tank *tanks::Tank::CreateTankModel(const std::string &name, glm::vec3 lef
 
     // Set tank initial position
     tank->setCenterPosition(500, 700);
-    tank->setTurretPosition(500, 700 + DOME_CENTER_Y);
+    tank->setTurretPosition(500, 700 + TANK_BASE_HEIGHT + DOME_CENTER_Y);
     tank->setTurretAngle(glm::radians(30.0f));
 
     return tank;
 }
 
-glm::mat3 tanks::Tank::getRenderMatrix(Mesh *tankPart, float turretAngle) {
+glm::mat3 tanks::Tank::getRenderMatrix(Mesh *tankPart, float turretAngle, std::vector<glm::vec3> terrainCoordinates) {
     glm::mat3 modelMatrix = glm::mat3(1);
+
+    // Get portion of terrain that is under the tank
+    int terrainSegmentIndex = terrain::Terrain::getTerrainSegmentIndex(this->getCenterPosition().x);
+    float slope = terrain::Terrain::getSlope(terrainCoordinates, terrainSegmentIndex);
+
+    // Get tank y position
+    float tankY = this->getTankY(terrainCoordinates, terrainSegmentIndex);
+
+    // Set new center
+    this->setCenterPosition(this->getCenterPosition().x, tankY);
+    this->setTurretPosition(this->getTurretPosition().x, tankY + TANK_BASE_HEIGHT + DOME_CENTER_Y);
 
     // Body rendering
     if (std::string(tankPart->GetMeshID()).find("body") != std::string::npos) {
@@ -36,7 +47,7 @@ glm::mat3 tanks::Tank::getRenderMatrix(Mesh *tankPart, float turretAngle) {
         modelMatrix *= transform::Translate(this->getCenterPosition().x, this->getCenterPosition().y);
 
         // Translate to origin
-        modelMatrix *= transform::Translate(-TANK_BODY_LENGTH / 2, 1);
+        modelMatrix *= transform::Translate(-TANK_BODY_LENGTH / 2, 1 + TANK_BASE_HEIGHT);
     }
 
     // Turret rendering
@@ -59,7 +70,16 @@ std::vector<Mesh *> tanks::Tank::getTankParts() const {
     return tankParts;
 }
 
-float tanks::Tank::getTurretAngle() const {
+float tanks::Tank::getTankY(std::vector<glm::vec3> terrainCoordinates, int terrainSegmentIndex){
+    float temp = (this->getCenterPosition().x - terrainCoordinates[terrainSegmentIndex].x) /
+                    (terrainCoordinates[terrainSegmentIndex + 1].x - terrainCoordinates[terrainSegmentIndex].x);
+    
+    return terrainCoordinates[terrainSegmentIndex].y + temp *
+        (terrainCoordinates[terrainSegmentIndex + 1].y - terrainCoordinates[terrainSegmentIndex].y);
+}
+
+float tanks::Tank::getTurretAngle() const
+{
     return turretAngle;
 }
 

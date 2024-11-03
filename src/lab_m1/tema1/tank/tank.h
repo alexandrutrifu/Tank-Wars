@@ -39,6 +39,9 @@ namespace tanks {
             float getTurretAngle() const;
             void setTurretAngle(float angle);
 
+            float getTankAngle() const;
+            void setTankAngle(float angle);
+
             glm::vec2 getCenterPosition() const;
             void setCenterPosition(float x, float y);
 
@@ -50,6 +53,7 @@ namespace tanks {
             glm::vec2 centerPosition{};
             glm::vec2 turretPosition{};
             float turretAngle{};
+            float tankAngle{};
     };
 }
 

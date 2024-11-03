@@ -38,7 +38,7 @@ float Terrain::getTerrainY(float x) {
 std::vector<glm::vec3> Terrain::getTerrainCoordinates(glm::ivec2 resolution) {
 	std::vector<glm::vec3> terrainCoordinates;
 
-    for (int xCoordinate = 0; xCoordinate < resolution.x; xCoordinate += 10) {
+    for (int xCoordinate = 0; xCoordinate < resolution.x; xCoordinate += SEGMENT_SIZE) {
         float yCoordinate = getTerrainY(xCoordinate);
         terrainCoordinates.push_back(glm::vec3(xCoordinate, yCoordinate, 0));
     }
@@ -95,7 +95,7 @@ int terrain::Terrain::getTerrainSegmentIndex(float x) {
     return floor(x / SEGMENT_SIZE); 
 }
 
-float terrain::Terrain::getSlope(std::vector<glm::vec3> terrainCoordinates, int terrainSegmentIndex) {
-    return (terrainCoordinates[terrainSegmentIndex + 1].y - terrainCoordinates[terrainSegmentIndex].y) /
-            (terrainCoordinates[terrainSegmentIndex + 1].x - terrainCoordinates[terrainSegmentIndex].x);
+float terrain::Terrain::getTankAngle(std::vector<glm::vec3> terrainCoordinates, int terrainSegmentIndex) {
+    return atan2(terrainCoordinates[terrainSegmentIndex + 1].y - terrainCoordinates[terrainSegmentIndex].y,
+            (terrainCoordinates[terrainSegmentIndex + 1].x - terrainCoordinates[terrainSegmentIndex].x));
 }

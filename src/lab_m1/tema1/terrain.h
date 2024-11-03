@@ -15,7 +15,7 @@
 #include "components/simple_scene.h"
 #include "utils/glm_utils.h"
 
-#define SEGMENT_SIZE 10
+#define SEGMENT_SIZE 1
 
 
 namespace terrain
@@ -48,7 +48,7 @@ namespace terrain
 
             static int getTerrainSegmentIndex(float x);
 
-            static float getSlope(std::vector<glm::vec3> terrainCoordinates, int terrainSegmentIndex);
+            static float getTankAngle(std::vector<glm::vec3> terrainCoordinates, int terrainSegmentIndex);
 
             std::vector<glm::vec3> terrainCoordinates;
 

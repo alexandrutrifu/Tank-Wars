@@ -8,31 +8,8 @@ tanks::Tank::~Tank() = default;
 tanks::Tank *tanks::Tank::CreateTankModel(const std::string &name, glm::vec3 leftBottomCorner) {
     tanks::Tank *tank = new tanks::Tank();
 
-    // // Create tank base
-    // Mesh *tankBase = objects::CreateTrapezoid(name + "_base", leftBottomCorner,
-    //             TANK_BASE_LENGTH, TANK_BASE_HEIGHT, tank_base_colour, true);
-    
-    // // Create tank body
-    // Mesh *tankBody = objects::CreateTrapezoid(name + "_body", leftBottomCorner,
-    //             TANK_BODY_LENGTH, TANK_BODY_HEIGHT, tank_body_colour, true);
-
-    // // Create tank dome
-    // Mesh *tankDome = objects::CreateDiskHalf(name + "_dome", TANK_DOME_RADIUS,
-    //             DISK_VERTEX_COUNT, leftBottomCorner,
-    //             tank_body_colour, true);
-
-    // // Create tank turret
-    // Mesh *tankTurret = objects::CreateSquare(name + "_turret", leftBottomCorner,
-    //             TANK_TURRET_HEIGHT, tank_turret_colour, true);
-
-    // // Add tank parts to object vector (in the order they should be rendered)
-    // tank->tankParts.push_back(tankTurret);
-    // tank->tankParts.push_back(tankBase);
-    // tank->tankParts.push_back(tankBody);
-    // tank->tankParts.push_back(tankDome);
-
     // Create tank base + body + dome
-    Mesh *tankNoTurret = objects::CreateTank(name, leftBottomCorner);
+    Mesh *tankNoTurret = objects::CreateTank(name + "_body", leftBottomCorner);
 
     // Create tank turret
     Mesh *tankTurret = objects::CreateSquare(name + "_turret", leftBottomCorner,
@@ -42,53 +19,38 @@ tanks::Tank *tanks::Tank::CreateTankModel(const std::string &name, glm::vec3 lef
     tank->tankParts.push_back(tankTurret);
     tank->tankParts.push_back(tankNoTurret);
 
+    // Set tank initial position
+    tank->setCenterPosition(500, 700);
+    tank->setTurretPosition(500, 700 + DOME_CENTER_Y);
+    tank->setTurretAngle(glm::radians(30.0f));
+
     return tank;
 }
 
 glm::mat3 tanks::Tank::getRenderMatrix(Mesh *tankPart, float turretAngle) {
     glm::mat3 modelMatrix = glm::mat3(1);
 
-    modelMatrix *= transform::Translate(this->getCenterPosition().x, this->getCenterPosition().y);
-
-    // Rotate base upside down
-    if (std::string(tankPart->GetMeshID()).find("base") != std::string::npos) {
-        modelMatrix *= transform::Translate(TANK_BASE_LENGTH / 2, TANK_BASE_HEIGHT / 2);
-        modelMatrix *= transform::Translate(0, -TANK_BODY_HEIGHT / 2);
-        modelMatrix *= transform::Translate(TANK_BASE_START_X, 0);
-        modelMatrix *= transform::Scale(1, -1);
-        // modelMatrix *= transform::Scale(0.5, 0.5);
-        modelMatrix *= transform::Translate(-TANK_BASE_LENGTH / 2, -TANK_BASE_HEIGHT / 2);
-    }
-
-    // Render body
+    // Body rendering
     if (std::string(tankPart->GetMeshID()).find("body") != std::string::npos) {
-        modelMatrix *= transform::Translate(TANK_BODY_LENGTH / 2, TANK_BODY_HEIGHT / 2);
-        // modelMatrix *= transform::Scale(0.5, 0.5);
-        modelMatrix *= transform::Translate(-TANK_BODY_LENGTH / 2, -TANK_BODY_HEIGHT / 2);
+        // Set new center
+        modelMatrix *= transform::Translate(this->getCenterPosition().x, this->getCenterPosition().y);
+
+        // Translate to origin
+        modelMatrix *= transform::Translate(-TANK_BODY_LENGTH / 2, 1);
     }
 
-    // Render dome
-    if (std::string(tankPart->GetMeshID()).find("dome") != std::string::npos) {
-        modelMatrix *= transform::Translate(TANK_DOME_RADIUS / 2, TANK_DOME_RADIUS / 2);
-        modelMatrix *= transform::Translate(DOME_CENTER_X, DOME_CENTER_Y);
-        // modelMatrix *= transform::Scale(0.5, 0.5);
-        modelMatrix *= transform::Translate(-TANK_DOME_RADIUS / 2, -TANK_DOME_RADIUS / 2);
-    }
-
-    // Scale turret into rectangle shape and translate it on top of the dome
+    // Turret rendering
     if (std::string(tankPart->GetMeshID()).find("turret") != std::string::npos) {
-        // modelMatrix *= transform::Translate(this->getCenterPosition().x, this->getCenterPosition().y);
-        modelMatrix *= transform::Translate(DOME_CENTER_X + TANK_TURRET_HEIGHT / 2, DOME_CENTER_Y * 1.1 / 0.9);
-        modelMatrix *= transform::Rotate(turretAngle);
+        // Set new center
+        modelMatrix *= transform::Translate(this->getTurretPosition().x, this->getTurretPosition().y);
+
+        modelMatrix *= transform::Rotate(this->getTurretAngle());
         modelMatrix *= transform::Scale(TANK_TURRET_SCALE_FACTOR, 1);
-        // modelMatrix *= transform::Scale(0.5, 0.5);
-        // modelMatrix *= transform::Translate(-this->getCenterPosition().x, -this->getCenterPosition().y);
+
+        // Translate to origin
+        modelMatrix *= transform::Translate(0, 1 - TANK_TURRET_HEIGHT / 2);
     }
 
-    // Scale tank parts
-    // modelMatrix *= transform::Translate(this->getCenterPosition().x, this->getCenterPosition().y);
-    // modelMatrix *= transform::Scale(0.5, 0.5);
-    // modelMatrix *= transform::Translate(-this->getCenterPosition().x, -this->getCenterPosition().y);
 
     return modelMatrix;
 }
@@ -111,4 +73,12 @@ glm::vec2 tanks::Tank::getCenterPosition() const {
 
 void tanks::Tank::setCenterPosition(float x, float y) {
     centerPosition = glm::vec2(x, y);
+}
+
+glm::vec2 tanks::Tank::getTurretPosition() const {
+    return turretPosition;
+}
+
+void tanks::Tank::setTurretPosition(float x, float y) {
+    turretPosition = glm::vec2(x, y);
 }

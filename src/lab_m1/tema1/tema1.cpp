@@ -36,28 +36,17 @@ void Tema1::Init()
         AddMeshToList(square);
     }
 
-    // // Disk
-    // Mesh* disk = objects::CreateDisk("disk", 400, 100, glm::vec3(0, -1, 0), glm::vec3(1, 1, 0), true);
-    // AddMeshToList(disk);
-
-    // // Half disk
-    // Mesh* halfDisk = objects::CreateDiskHalf("halfDisk", 400, 360, glm::vec3(0, -1, 0), glm::vec3(1, 1, 0), true);
-    // AddMeshToList(halfDisk);
-
-    // // Trapezoid
-    // Mesh* trapezoid = objects::CreateTrapezoid("trapezoid", glm::vec3(0, -1, 0), 400, 70, glm::vec3(0.796, 0.686, 0.533), true);
-    // AddMeshToList(trapezoid);
-
     // Initialize tank model
     tanks::Tank *tank = tanks::Tank::CreateTankModel("tank", corner);
-    
-    tank->setCenterPosition(1000, 500);
-    tank->setTurretAngle(glm::radians(30.0f));
+
     tanks.push_back(tank);
 
     for (auto &tankPart : tank->getTankParts()) {
         AddMeshToList(tankPart);
     }
+
+    // Start round
+    roundStart = true;
 }
 
 
@@ -102,12 +91,14 @@ void Tema1::Update(float deltaTimeSeconds)
 
     glClear(GL_DEPTH_BUFFER_BIT);
 
-    // Render tanks
+    // Update tank rendering
     for (auto &tank : tanks) {
+        cout << "Tank center position: " << tank->getCenterPosition().x << " " << tank->getCenterPosition().y << endl;
+        cout << "Tank turret position: " << tank->getTurretPosition().x << " " << tank->getTurretPosition().y << endl;
         for (auto &tankPart : tank->getTankParts()) {
-            // modelMatrix = tank->getRenderMatrix(tankPart, tank->getTurretAngle());
-            modelMatrix = glm::mat3(1);
-            modelMatrix *= transform::Translate(tank->getCenterPosition().x, tank->getCenterPosition().y);
+            glm::mat3 modelMatrix = glm::mat3(1);
+
+            modelMatrix *= tank->getRenderMatrix(tankPart, tank->getTurretAngle());
 
             RenderMesh2D(tankPart, shaders["VertexColor"], modelMatrix);
             glClear(GL_DEPTH_BUFFER_BIT);
@@ -163,16 +154,20 @@ void Tema1::OnInputUpdate(float deltaTime, int mods)
         // Move tank -> left
         tanks::Tank *tank = tanks[0];
         glm::vec2 centerPosition = tank->getCenterPosition();
+        glm::vec2 turretPosition = tank->getTurretPosition();
 
         tank->setCenterPosition(centerPosition.x - 100 * deltaTime, centerPosition.y);
+        tank->setTurretPosition(turretPosition.x - 100 * deltaTime, turretPosition.y);
     }
 
     if (window->KeyHold(GLFW_KEY_D)) {
         // Move tank -> right
         tanks::Tank *tank = tanks[0];
         glm::vec2 centerPosition = tank->getCenterPosition();
+        glm::vec2 turretPosition = tank->getTurretPosition();
 
         tank->setCenterPosition(centerPosition.x + 100 * deltaTime, centerPosition.y);
+        tank->setTurretPosition(turretPosition.x + 100 * deltaTime, turretPosition.y);
     }
 }
 

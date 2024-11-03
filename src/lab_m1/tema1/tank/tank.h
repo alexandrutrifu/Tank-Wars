@@ -26,6 +26,9 @@ namespace tanks {
             // Returns a vector of meshes that form the tank model
             static tanks::Tank *CreateTankModel(const std::string &name, glm::vec3 leftBottomCorner);
 
+            // Places tank at initial position
+            glm::mat3 placeTankAtInitialPosition(Mesh *tankPart);
+
             // Builds Render Matrix
             glm::mat3 getRenderMatrix(Mesh *tankPart, float turretAngle);
 
@@ -38,9 +41,13 @@ namespace tanks {
             glm::vec2 getCenterPosition() const;
             void setCenterPosition(float x, float y);
 
+            glm::vec2 getTurretPosition() const;
+            void setTurretPosition(float x, float y);
+
         private:
             std::vector<Mesh *> tankParts{};
             glm::vec2 centerPosition{};
+            glm::vec2 turretPosition{};
             float turretAngle{};
     };
 }

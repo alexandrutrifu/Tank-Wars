@@ -53,6 +53,8 @@ namespace m1
 
         std::vector<tanks::Tank *> tanks{};
 
+        bool roundStart{};
+
     };
 }   // namespace m1
 

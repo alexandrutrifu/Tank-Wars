@@ -13,8 +13,11 @@
 #include "lab_m1/tema1/objects/objects.h"
 #include "lab_m1/tema1/tank/tank.h"
 
+
 namespace m1
 {
+    const glm::vec3 skyBlue = glm::vec3(0.612, 0.800, 0.925);
+
     class Tema1 : public gfxc::SimpleScene
     {
     public:

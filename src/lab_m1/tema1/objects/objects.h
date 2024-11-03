@@ -17,6 +17,25 @@
 
 #define DISK_VERTEX_COUNT 100
 
+#define TANK_BODY_LENGTH 400
+#define TANK_BODY_HEIGHT 70
+
+#define TANK_TURRET_SCALE_FACTOR 8
+#define TANK_TURRET_HEIGHT 20
+
+#define TANK_BASE_START_X (TANK_BODY_HEIGHT * 0.7)
+#define TANK_BASE_LENGTH (TANK_BODY_LENGTH - TANK_BASE_START_X * 2)
+#define TANK_BASE_HEIGHT (TANK_BODY_HEIGHT * 0.6)
+
+#define TANK_DOME_RADIUS 70
+#define DOME_CENTER_X (TANK_BODY_LENGTH / 2)
+#define DOME_CENTER_Y (TANK_BODY_HEIGHT * 0.9)
+
+
+extern const glm::vec3 tank_base_colour;
+extern const glm::vec3 tank_body_colour;
+extern const glm::vec3 tank_turret_colour;
+
 namespace objects {
     // Create square with given bottom left corner, length and color
     Mesh *CreateSquare(const std::string &name, glm::vec3 leftBottomCorner,
@@ -32,7 +51,11 @@ namespace objects {
 
     // Create trapezoid with given bottom left corner, length, height and color
     Mesh *CreateTrapezoid(const std::string &name, glm::vec3 leftBottomCorner,
-                float length, float height, glm::vec3 color, bool fill = false);
+                float length, float height, glm::vec3 color, bool fill = false);\
+    
+    // Create tank model
+    Mesh *CreateTank(const std::string &name, glm::vec3 leftBottomCorner);
+                
 }
 
 #endif

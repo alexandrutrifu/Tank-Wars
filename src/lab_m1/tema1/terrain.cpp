@@ -30,14 +30,15 @@ void Terrain::initializeSingularSquare(int index, glm::vec3 pointA, glm::vec3 po
 }
 
 float Terrain::getTerrainY(float x) {
-    return 20 * cos(50 * x + 25) + 20 * sin(3 * x + 1) + 500  + 30 * sin(4 * x);
-    // return 500 + 50 * sin(x) + 30 * sin(4 * x) + sin(3 * x);
+    return 150 * sin((M_PI / 640) * x) + 100 * sin((M_PI / 320) * x) +
+            50 * sin((M_PI / 160) * x) + 75 * sin((M_PI / 500) * x) +
+            30 * sin((M_PI / 100) * x) + 600;
 }
 
 std::vector<glm::vec3> Terrain::getTerrainCoordinates(glm::ivec2 resolution) {
 	std::vector<glm::vec3> terrainCoordinates;
 
-    for (int xCoordinate = 0; xCoordinate < resolution.x; xCoordinate += 40) {
+    for (int xCoordinate = 0; xCoordinate < resolution.x; xCoordinate += 10) {
         float yCoordinate = getTerrainY(xCoordinate);
         terrainCoordinates.push_back(glm::vec3(xCoordinate, yCoordinate, 0));
     }

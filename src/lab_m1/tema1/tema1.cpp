@@ -31,7 +31,7 @@ void Tema1::Init()
         glm::vec3 pointB = terrainCoordinates[startIndex + 1];
 
         // Create standard square
-        Mesh* square = objects::CreateSquare("square" + std::to_string(startIndex), corner, 1, glm::vec3(1, 0, 0), true);
+        Mesh* square = objects::CreateSquare("square" + std::to_string(startIndex), corner, 1, glm::vec3(0.94, 0.87, 0.71), true);
         
         AddMeshToList(square);
     }
@@ -66,7 +66,7 @@ void Tema1::FrameStart()
     // Clears the color buffer (using the previously set color) and depth buffer
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LESS);
-    glClearColor(0, 0, 0, 1);
+    glClearColor(skyBlue.x, skyBlue.y, skyBlue.z, 1);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     const glm::ivec2 resolution = window->GetResolution();
@@ -105,7 +105,9 @@ void Tema1::Update(float deltaTimeSeconds)
     // Render tanks
     for (auto &tank : tanks) {
         for (auto &tankPart : tank->getTankParts()) {
-            modelMatrix = tank->getRenderMatrix(tankPart, tank->getTurretAngle());
+            // modelMatrix = tank->getRenderMatrix(tankPart, tank->getTurretAngle());
+            modelMatrix = glm::mat3(1);
+            modelMatrix *= transform::Translate(tank->getCenterPosition().x, tank->getCenterPosition().y);
 
             RenderMesh2D(tankPart, shaders["VertexColor"], modelMatrix);
             glClear(GL_DEPTH_BUFFER_BIT);

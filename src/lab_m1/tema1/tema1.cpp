@@ -103,24 +103,6 @@ void Tema1::Update(float deltaTimeSeconds)
             glClear(GL_DEPTH_BUFFER_BIT);
         }
     }
-
-    // Render disk
-    // glClear(GL_DEPTH_BUFFER_BIT);
-    // modelMatrix = glm::mat3(1);
-    // modelMatrix *= transform::Translate(1000, 500);
-    // RenderMesh2D(meshes["disk"], shaders["VertexColor"], modelMatrix);
-
-    // Render trapezoid
-    // glClear(GL_DEPTH_BUFFER_BIT);
-    // modelMatrix = glm::mat3(1);
-    // modelMatrix *= transform::Translate(1000, 500);
-    // RenderMesh2D(meshes["trapezoid"], shaders["VertexColor"], modelMatrix);
-
-    // Render half disk
-    // glClear(GL_DEPTH_BUFFER_BIT);
-    // modelMatrix = glm::mat3(1);
-    // modelMatrix *= transform::Translate(1000, 500);
-    // RenderMesh2D(meshes["halfDisk"], shaders["VertexColor"], modelMatrix);
 }
 
 
@@ -154,6 +136,12 @@ void Tema1::OnInputUpdate(float deltaTime, int mods)
         tanks::Tank *tank = tanks[0];
         glm::vec2 centerPosition = tank->getCenterPosition();
         glm::vec2 turretPosition = tank->getTurretPosition();
+
+        // Limit movement to terrain
+        // if (centerPosition.y > 0) {
+        //     tank->setCenterPosition(centerPosition.x - 100 * deltaTime, centerPosition.y);
+        //     tank->setTurretPosition(turretPosition.x - 100 * deltaTime, turretPosition.y);
+        // }
 
         tank->setCenterPosition(centerPosition.x - 100 * deltaTime, centerPosition.y);
         tank->setTurretPosition(turretPosition.x - 100 * deltaTime, turretPosition.y);

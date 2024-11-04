@@ -5,7 +5,7 @@
 
 #include "../transform.h"
 #include "../objects/objects.h"
-#include "../terrain.h"
+#include "../terrain/terrain.h"
 #include "math.h"
 
 #include <vector>

@@ -22,7 +22,7 @@ tanks::Tank *tanks::Tank::CreateTankModel(const std::string &name, glm::vec3 lef
     // Set tank initial position
     tank->setCenterPosition(500, 700);
     tank->setTurretPosition(500, 700 + TANK_BASE_HEIGHT + DOME_CENTER_Y);
-    tank->setTurretAngle(glm::radians(0.0f));
+    tank->setTurretAngle(glm::radians(30.0f));
 
     return tank;
 }
@@ -58,7 +58,7 @@ glm::mat3 tanks::Tank::getRenderMatrix(Mesh *tankPart, float turretAngle, std::v
         // Rotate tank
         modelMatrix *= transform::Rotate(this->getTankAngle());
 
-        // Translate to origin
+        // Translate center to origin
         modelMatrix *= transform::Translate(-TANK_BODY_LENGTH / 2, 1 + TANK_BASE_HEIGHT);
     }
 
@@ -68,12 +68,6 @@ glm::mat3 tanks::Tank::getRenderMatrix(Mesh *tankPart, float turretAngle, std::v
         modelMatrix *= transform::Translate(this->getTurretPosition().x, this->getTurretPosition().y);
 
         printf("Tank angle: %f\n", glm::degrees(this->getTankAngle()));
-
-        // if (this->getTankAngle() < 0) {
-        //     modelMatrix *= transform::Rotate(max(this->getTurretAngle() - this->getTankAngle(), this->getTankAngle() + glm::radians(20.0f)));
-        // } else {
-        //     modelMatrix *= transform::Rotate(max(this->getTurretAngle() - this->getTankAngle(), this->getTankAngle() + glm::radians(20.0f)));
-        // }
 
         modelMatrix *= transform::Rotate(this->getTankAngle() + this->getTurretAngle());
         

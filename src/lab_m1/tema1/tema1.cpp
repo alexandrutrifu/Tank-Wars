@@ -101,7 +101,7 @@ void Tema1::Update(float deltaTimeSeconds)
         for (auto &tankPart : tank->getTankParts()) {
             glm::mat3 modelMatrix = glm::mat3(1);
 
-            modelMatrix *= tank->getRenderMatrix(tankPart, tank->getTurretAngle(), terrainCoordinates);
+            modelMatrix *= tank->getRenderMatrix(tankPart, terrainCoordinates);
 
             RenderMesh2D(tankPart, shaders["VertexColor"], modelMatrix);
             glClear(GL_DEPTH_BUFFER_BIT);
@@ -113,11 +113,23 @@ void Tema1::Update(float deltaTimeSeconds)
         projectile::Projectile *projectile = projectiles[index];
 
         if (projectile->isOnScreen()) {
+            printf("Projectile %d position: %f %f\n", index, projectile->getCenterPosition().x, projectile->getCenterPosition().y);
+
+            // Decrement time to live
+            if (projectile->getTimeToLive() > 0) {
+                projectile->setTimeToLive(projectile->getTimeToLive() - deltaTimeSeconds);
+            } else {
+                projectile->setOnScreen(false);
+                projectile->setTimeToLive(PROJECTILE_TTL);
+
+                continue;
+            }
+
             glm::mat3 modelMatrix = glm::mat3(1);
 
-            // modelMatrix *= projectile->getRenderMatrix(projectile->getProjectileModel(), 0, terrainCoordinates);
+            modelMatrix *= projectile->getRenderMatrix();
 
-            // RenderMesh2D(projectile->getProjectileModel(), shaders["VertexColor"], modelMatrix);
+            RenderMesh2D(projectile->getProjectileModel(), shaders["VertexColor"], modelMatrix);
             glClear(GL_DEPTH_BUFFER_BIT);
         }
     }
@@ -179,7 +191,23 @@ void Tema1::OnInputUpdate(float deltaTime, int mods)
 
 void Tema1::OnKeyPress(int key, int mods)
 {
-    // Add key press event
+    if (key == GLFW_KEY_SPACE) {
+        // Fire projectile
+        for (int index = 0; index < PROJECTILE_POOL_SIZE; index++) {
+            projectile::Projectile *projectile = projectiles[index];
+
+            if (!projectile->isOnScreen()) {
+                projectile->setOnScreen(true);
+
+                tanks::Tank *tank = tanks[0];
+                glm::vec2 turretEndPosition = tank->computeProjectileStartPos();
+
+                projectile->setCenterPosition(turretEndPosition.x, turretEndPosition.y);
+
+                break;
+            }
+        }
+    }
 }
 
 

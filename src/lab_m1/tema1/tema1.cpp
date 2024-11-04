@@ -28,8 +28,8 @@ void Tema1::Init()
     terrainCoordinates = terrain.getTerrainCoordinates(resolution);
 
     for (int startIndex = 0; startIndex < terrainCoordinates.size() - 1; startIndex++) {
-        glm::vec3 pointA = terrainCoordinates[startIndex];
-        glm::vec3 pointB = terrainCoordinates[startIndex + 1];
+        glm::vec3 *pointA = terrainCoordinates[startIndex];
+        glm::vec3 *pointB = terrainCoordinates[startIndex + 1];
 
         // Create standard square
         Mesh* square = objects::CreateSquare("square" + std::to_string(startIndex), corner, 1, glm::vec3(0.94, 0.87, 0.71), true);
@@ -73,20 +73,20 @@ void Tema1::Update(float deltaTimeSeconds)
 {
     // Render terrain
     for (int startIndex = 0; startIndex < terrainCoordinates.size() - 1; startIndex++) {
-        glm::vec3 pointA = terrainCoordinates[startIndex];
-        glm::vec3 pointB = terrainCoordinates[startIndex + 1];
+        glm::vec3 *pointA = terrainCoordinates[startIndex];
+        glm::vec3 *pointB = terrainCoordinates[startIndex + 1];
 
         modelMatrix = glm::mat3(1);
 
         // (1) Translation
-        modelMatrix *= transform::Translate(pointA.x, pointA.y);
+        modelMatrix *= transform::Translate(pointA->x, pointA->y);
 
         // (2) Shearing
-        float shearY = (pointB.y - pointA.y) / (pointB.x - pointA.x);
+        float shearY = (pointB->y - pointA->y) / (pointB->x - pointA->x);
         modelMatrix *= transform::ShearOY(shearY);
 
-        float segmentHeight = max(pointA.y, pointB.y);
-        float segmentWidth = pointB.x - pointA.x;
+        float segmentHeight = max(pointA->y, pointB->y);
+        float segmentWidth = pointB->x - pointA->x;
 
         // (3) Scaling
         modelMatrix *= transform::Scale(segmentWidth, segmentHeight);
@@ -115,6 +115,22 @@ void Tema1::Update(float deltaTimeSeconds)
         if (projectile->isOnScreen()) {
             printf("Projectile %d position: %f %f\n", index, projectile->getCenterPosition().x, projectile->getCenterPosition().y);
 
+            // Handle collision with terrain
+            float yUnderProjectile =
+                terrain::Terrain::getCorrespondingY(terrainCoordinates,
+                        terrain::Terrain::getTerrainSegmentIndex(projectile->getCenterPosition().x),
+                        projectile->getCenterPosition().x);
+
+            if (projectile->getCenterPosition().y - yUnderProjectile < COLLISION_THRESHOLD) {
+                projectile->setOnScreen(false);
+                projectile->setTimeToLive(PROJECTILE_TTL);
+
+                // Destroy terrain
+                terrain::Terrain::destroyTerrain(terrainCoordinates, projectile->getCenterPosition().x);
+
+                continue;
+            }
+
             // Decrement time to live
             if (projectile->getTimeToLive() > 0) {
                 projectile->setTimeToLive(projectile->getTimeToLive() - deltaTimeSeconds);
@@ -127,7 +143,7 @@ void Tema1::Update(float deltaTimeSeconds)
 
             glm::mat3 modelMatrix = glm::mat3(1);
 
-            modelMatrix *= projectile->getRenderMatrix();
+            modelMatrix *= projectile->getRenderMatrix(deltaTimeSeconds);
 
             RenderMesh2D(projectile->getProjectileModel(), shaders["VertexColor"], modelMatrix);
             glClear(GL_DEPTH_BUFFER_BIT);
@@ -198,11 +214,14 @@ void Tema1::OnKeyPress(int key, int mods)
 
             if (!projectile->isOnScreen()) {
                 projectile->setOnScreen(true);
+                projectile->setTimeToLive(PROJECTILE_TTL);
 
                 tanks::Tank *tank = tanks[0];
                 glm::vec2 turretEndPosition = tank->computeProjectileStartPos();
 
                 projectile->setCenterPosition(turretEndPosition.x, turretEndPosition.y);
+                projectile->setMovementVector(glm::vec2(INITIAL_MAGNITUDE * cos(tank->getTurretAngle() + tank->getTankAngle()),
+                                                        INITIAL_MAGNITUDE * sin(tank->getTurretAngle() + tank->getTankAngle())));
 
                 break;
             }

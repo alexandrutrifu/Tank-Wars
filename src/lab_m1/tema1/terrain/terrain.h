@@ -18,6 +18,7 @@
 
 #define SEGMENT_SIZE 1
 
+#define COLLISION_RADIUS 64
 
 namespace terrain
 {
@@ -25,6 +26,9 @@ namespace terrain
         public:
             Terrain();
             ~Terrain() override;
+
+            // Get the y position of a point on the terrain at a given x coordinate
+            static float getCorrespondingY(std::vector<glm::vec3 *> terrainCoordinates, int terrainSegmentIndex, float x);
 
             // Render a terrain square
             void initializeSingularSquare(int index, glm::vec3 pointA, glm::vec3 pointB,
@@ -34,7 +38,7 @@ namespace terrain
             static float getTerrainY(float x);
 
             // Initialize the terrain coordinates array
-            std::vector<glm::vec3> getTerrainCoordinates(glm::ivec2 resolution);
+            std::vector<glm::vec3 *> getTerrainCoordinates(glm::ivec2 resolution);
 
             // Initialize terrain
             void initializeTerrain(glm::ivec2 resolution,
@@ -47,9 +51,12 @@ namespace terrain
             // Render the terrain
             void renderTerrain(std::unordered_map<std::string, Mesh *> &meshes);
 
+            // Destroy terrain when a projectile hits it at a given x coordinate
+            static void destroyTerrain(std::vector<glm::vec3 *> terrainCoordinates, float x);
+
             static int getTerrainSegmentIndex(float x);
 
-            static float getTankAngle(std::vector<glm::vec3> terrainCoordinates, int terrainSegmentIndex);
+            static float getTankAngle(std::vector<glm::vec3 *> terrainCoordinates, int terrainSegmentIndex);
 
             std::vector<glm::vec3> terrainCoordinates;
 

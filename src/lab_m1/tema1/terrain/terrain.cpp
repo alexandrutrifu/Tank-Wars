@@ -11,6 +11,14 @@ Terrain::Terrain() = default;
 
 Terrain::~Terrain() = default;
 
+float terrain::Terrain::getCorrespondingY(std::vector<glm::vec3 *> terrainCoordinates, int terrainSegmentIndex, float x){
+    float temp = (x - terrainCoordinates[terrainSegmentIndex]->x) /
+                    (terrainCoordinates[terrainSegmentIndex + 1]->x - terrainCoordinates[terrainSegmentIndex]->x);
+    
+    return terrainCoordinates[terrainSegmentIndex]->y + temp *
+        (terrainCoordinates[terrainSegmentIndex + 1]->y - terrainCoordinates[terrainSegmentIndex]->y);
+}
+
 void Terrain::initializeSingularSquare(int index, glm::vec3 pointA, glm::vec3 pointB,
                         std::unordered_map<std::string, Mesh *> &meshes) {
     glm::vec3 corner = glm::vec3(0, 0, 0);
@@ -34,27 +42,27 @@ float Terrain::getTerrainY(float x) {
             30 * sin((M_PI / 100) * x) + 600;
 }
 
-std::vector<glm::vec3> Terrain::getTerrainCoordinates(glm::ivec2 resolution) {
-	std::vector<glm::vec3> terrainCoordinates;
+std::vector<glm::vec3*> Terrain::getTerrainCoordinates(glm::ivec2 resolution) {
+    std::vector<glm::vec3*> terrainCoordinates;
 
     for (int xCoordinate = 0; xCoordinate < resolution.x; xCoordinate += SEGMENT_SIZE) {
         float yCoordinate = getTerrainY(xCoordinate);
-        terrainCoordinates.push_back(glm::vec3(xCoordinate, yCoordinate, 0));
+        terrainCoordinates.push_back(new glm::vec3(xCoordinate, yCoordinate, 0));
     }
 
     return terrainCoordinates;
 }
 
-void Terrain::initializeTerrain(glm::ivec2 resolution, std::unordered_map<std::string, Mesh *> &meshes) {
-    terrainCoordinates = getTerrainCoordinates(resolution);
+// void Terrain::initializeTerrain(glm::ivec2 resolution, std::unordered_map<std::string, Mesh *> &meshes) {
+//     terrainCoordinates = getTerrainCoordinates(resolution);
 
-    for (int startIndex = 0; startIndex < terrainCoordinates.size() - 1; startIndex++) {
-        glm::vec3 pointA = terrainCoordinates[startIndex];
-        glm::vec3 pointB = terrainCoordinates[startIndex + 1];
+//     for (int startIndex = 0; startIndex < terrainCoordinates.size() - 1; startIndex++) {
+//         glm::vec3 pointA = terrainCoordinates[startIndex];
+//         glm::vec3 pointB = terrainCoordinates[startIndex + 1];
 
-        initializeSingularSquare(startIndex, pointA, pointB, meshes);
-    }
-}
+//         initializeSingularSquare(startIndex, pointA, pointB, meshes);
+//     }
+// }
 
 void Terrain::renderTerrainSquare(int index, glm::vec3 pointA, glm::vec3 pointB,
                         std::unordered_map<std::string, Mesh *> &meshes) {
@@ -85,11 +93,32 @@ void Terrain::renderTerrain(std::unordered_map<std::string, Mesh *> &meshes) {
     }
 }
 
-int terrain::Terrain::getTerrainSegmentIndex(float x) {
-    return floor(x / SEGMENT_SIZE); 
+void terrain::Terrain::destroyTerrain(std::vector<glm::vec3 *> terrainCoordinates, float x) {
+    int startSegmentIndex = getTerrainSegmentIndex(x - COLLISION_RADIUS);
+    int endSegmentIndex = getTerrainSegmentIndex(x + COLLISION_RADIUS);
+
+    float yCenter = getCorrespondingY(terrainCoordinates, getTerrainSegmentIndex(x), x);
+
+    for (int segmentIndex = startSegmentIndex; segmentIndex <= endSegmentIndex; segmentIndex++) {
+        glm::vec3 *hitPoint = terrainCoordinates[segmentIndex];
+
+        // Check if the point is within the collision radius
+        if (terrainCoordinates[segmentIndex]->y >
+                sqrt(pow(COLLISION_RADIUS, 2) - pow(hitPoint->x - x, 2)) + yCenter ||
+                    pow(hitPoint->x - x, 2) + pow(terrainCoordinates[segmentIndex]->y - yCenter, 2) < pow(COLLISION_RADIUS, 2)) {
+            printf("Old y: %f\n", terrainCoordinates[segmentIndex]->y);
+            terrainCoordinates[segmentIndex]->y = -sqrt(pow(COLLISION_RADIUS, 2) - pow(hitPoint->x - x, 2)) + yCenter;
+            printf("New y: %f\n", terrainCoordinates[segmentIndex]->y);
+        }
+    }
 }
 
-float terrain::Terrain::getTankAngle(std::vector<glm::vec3> terrainCoordinates, int terrainSegmentIndex) {
-    return atan2(terrainCoordinates[terrainSegmentIndex + 1].y - terrainCoordinates[terrainSegmentIndex].y,
-            (terrainCoordinates[terrainSegmentIndex + 1].x - terrainCoordinates[terrainSegmentIndex].x));
+int terrain::Terrain::getTerrainSegmentIndex(float x)
+{
+    return floor(x / SEGMENT_SIZE);
+}
+
+float terrain::Terrain::getTankAngle(std::vector<glm::vec3 *> terrainCoordinates, int terrainSegmentIndex) {
+    return atan2(terrainCoordinates[terrainSegmentIndex + 1]->y - terrainCoordinates[terrainSegmentIndex]->y,
+            (terrainCoordinates[terrainSegmentIndex + 1]->x - terrainCoordinates[terrainSegmentIndex]->x));
 }

@@ -50,7 +50,7 @@ namespace m1
         float scaleCar1{}, scaleCar2{};
         float angularStep{};
 
-        std::vector<glm::vec3> terrainCoordinates{};
+        std::vector<glm::vec3 *> terrainCoordinates{};
 
         std::vector<tanks::Tank *> tanks{};
         std::vector<projectile::Projectile *> projectiles{};

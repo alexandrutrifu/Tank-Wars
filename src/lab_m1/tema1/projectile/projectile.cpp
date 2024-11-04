@@ -17,8 +17,13 @@ projectile::Projectile *projectile::Projectile::CreateProjectileModel(const std:
     return projectile;
 }
 
-glm::mat3 projectile::Projectile::getRenderMatrix() {
+glm::mat3 projectile::Projectile::getRenderMatrix(float deltaTimeSeconds) {
     glm::mat3 modelMatrix = glm::mat3(1);
+
+    // Update movement vector
+    this->setCenterPosition(this->getCenterPosition().x + this->getMovementVector().x * deltaTimeSeconds,
+                            this->getCenterPosition().y + this->getMovementVector().y * deltaTimeSeconds);
+    this->setMovementVector(this->getMovementVector() + projectile::gAcceleration * deltaTimeSeconds);
 
     modelMatrix *= transform::Translate(this->getCenterPosition().x, this->getCenterPosition().y);
     
@@ -55,4 +60,12 @@ float projectile::Projectile::getTimeToLive() const{
 
 void projectile::Projectile::setTimeToLive(float ttl){
     timeToLive = ttl;
+}
+
+glm::vec2 projectile::Projectile::getMovementVector() const {
+    return movementVector;
+}
+
+void projectile::Projectile::setMovementVector(glm::vec2 movementVector) {
+    projectile::Projectile::movementVector = movementVector;
 }

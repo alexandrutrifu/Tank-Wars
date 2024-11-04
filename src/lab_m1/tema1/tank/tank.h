@@ -19,6 +19,33 @@
 #include "utils/glm_utils.h"
 
 
+namespace healthBar {
+    const glm::vec3 health_bar_colour = glm::vec3(1, 1, 1);
+
+    class HealthBar {
+        public:
+            HealthBar();
+            ~HealthBar();
+
+            // Returns a vector of meshes that form the health bar model
+            static HealthBar *CreateHealthBarModel(const std::string &name, glm::vec3 leftBottomCorner,
+                        const glm::vec3 &health_bar_colour);
+
+            float getHealth() const;
+            void setHealth(float health);
+
+            glm::vec2 getCenterPosition() const;
+            void setCenterPosition(float x, float y);
+
+            std::vector<Mesh *> getHealthBarParts() const;
+
+        private:
+            std::vector<Mesh *> healthBarParts{};
+            glm::vec2 centerPosition{};
+            float health{};
+    };
+}
+
 namespace tanks {
     const glm::vec3 tankA_base_colour = glm::vec3(0.451, 0.392, 0.306);
     const glm::vec3 tankA_body_colour = glm::vec3(0.796, 0.686, 0.533);
@@ -41,6 +68,9 @@ namespace tanks {
             // Builds Render Matrix
             glm::mat3 getRenderMatrix(Mesh *tankPart, std::vector<glm::vec3 *> terrainCoordinates);
 
+            // Builds Render Matrix for health bar
+            glm::mat3 getHealthBarRenderMatrix(Mesh *healthBarPart);
+
             // Get the tank parts
             std::vector<Mesh *> getTankParts() const;
 
@@ -59,8 +89,12 @@ namespace tanks {
             glm::vec2 getTurretPosition() const;
             void setTurretPosition(float x, float y);
 
+            healthBar::HealthBar *getHealthBar() const;
+            void setHealthBar(healthBar::HealthBar *healthBar);
+
         private:
             std::vector<Mesh *> tankParts{};
+            healthBar::HealthBar *healthBar{};
             glm::vec2 centerPosition{};
             glm::vec2 turretPosition{};
             float turretAngle{};

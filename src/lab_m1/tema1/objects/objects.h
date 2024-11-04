@@ -39,6 +39,14 @@
 #define START_POS_X_1 1000
 #define START_POS_Y_1 500
 
+#define HEALTH_BAR_HEIGHT 24
+#define HEALTH_BAR_LENGTH 150
+#define HEALTH_BAR_OFFSET (TANK_BASE_HEIGHT + DOME_CENTER_Y + \
+                            TANK_TURRET_HEIGHT * TANK_TURRET_SCALE_FACTOR + 10)
+#define HEALTH_BAR_SCALE_FACTOR (HEALTH_BAR_LENGTH / HEALTH_BAR_HEIGHT)
+
+#define TANK_COLLISION_RADIUS 110
+
 
 namespace objects {
     // Create square with given bottom left corner, length and color

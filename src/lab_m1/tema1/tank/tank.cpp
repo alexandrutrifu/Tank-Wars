@@ -79,6 +79,26 @@ glm::mat3 tanks::Tank::getRenderMatrix(Mesh *tankPart, std::vector<glm::vec3 *> 
     return modelMatrix;
 }
 
+glm::mat3 tanks::Tank::getHealthBarRenderMatrix(Mesh *healthBarPart) {
+    glm::mat3 modelMatrix = glm::mat3(1);
+
+    this->getHealthBar()->setCenterPosition(this->getCenterPosition().x, this->getCenterPosition().y + HEALTH_BAR_OFFSET);
+    modelMatrix *= transform::Translate(this->getCenterPosition().x - TANK_BODY_LENGTH / 2,
+                                            this->getCenterPosition().y + HEALTH_BAR_OFFSET);
+
+    if (std::string(healthBarPart->GetMeshID()).find("contour") != std::string::npos) {
+        modelMatrix *= transform::Scale(HEALTH_BAR_SCALE_FACTOR, 1);
+    }
+
+    if (std::string(healthBarPart->GetMeshID()).find("fill") != std::string::npos) {
+        modelMatrix *= transform::Scale(HEALTH_BAR_SCALE_FACTOR * this->getHealthBar()->getHealth() / 100.0f, 1);
+    }
+
+    modelMatrix *= transform::Translate(0, 1 - HEALTH_BAR_HEIGHT / 2);
+
+    return modelMatrix;
+}
+
 std::vector<Mesh *> tanks::Tank::getTankParts() const {
     return tankParts;
 }
@@ -121,4 +141,12 @@ glm::vec2 tanks::Tank::getTurretPosition() const {
 
 void tanks::Tank::setTurretPosition(float x, float y) {
     turretPosition = glm::vec2(x, y);
+}
+
+healthBar::HealthBar *tanks::Tank::getHealthBar() const{
+    return healthBar;
+}
+
+void tanks::Tank::setHealthBar(healthBar::HealthBar *healthBar){
+    this->healthBar = healthBar;
 }

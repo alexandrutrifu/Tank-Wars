@@ -71,6 +71,21 @@ void Tema1::Init()
         projectiles.push_back(projectile);
         AddMeshToList(projectile->getProjectileModel());
     }
+
+    // Initialize health bars
+    tankA->setHealthBar(healthBar::HealthBar::CreateHealthBarModel("healthBarA", corner, healthBar::health_bar_colour));
+    tankB->setHealthBar(healthBar::HealthBar::CreateHealthBarModel("healthBarB", corner, healthBar::health_bar_colour));
+
+    tankA->getHealthBar()->setCenterPosition(500, 700 + HEALTH_BAR_OFFSET);
+    tankB->getHealthBar()->setCenterPosition(2000, 700 + HEALTH_BAR_OFFSET);
+
+    for (auto &healthBarPart : tankA->getHealthBar()->getHealthBarParts()) {
+        AddMeshToList(healthBarPart);
+    }
+
+    for (auto &healthBarPart : tankB->getHealthBar()->getHealthBarParts()) {
+        AddMeshToList(healthBarPart);
+    }
 }
 
 void Tema1::FrameStart()
@@ -116,12 +131,31 @@ void Tema1::Update(float deltaTimeSeconds)
 
     // Render tanks
     for (auto &tank : tanks) {
+        // Check if tank has been destroyed
+        if (tank->getHealthBar()->getHealth() <= 0) {
+            continue;
+        }
+
         for (auto &tankPart : tank->getTankParts()) {
             glm::mat3 modelMatrix = glm::mat3(1);
 
             modelMatrix *= tank->getRenderMatrix(tankPart, terrainCoordinates);
 
             RenderMesh2D(tankPart, shaders["VertexColor"], modelMatrix);
+            glClear(GL_DEPTH_BUFFER_BIT);
+        }
+
+        // Render health bar
+        healthBar::HealthBar *healthBar = tank->getHealthBar();
+
+        printf("Tank health: %f\n", healthBar->getHealth());
+
+        for (auto &healthBarPart : healthBar->getHealthBarParts()) {
+            glm::mat3 modelMatrix = glm::mat3(1);
+
+            modelMatrix *= tank->getHealthBarRenderMatrix(healthBarPart);
+
+            RenderMesh2D(healthBarPart, shaders["VertexColor"], modelMatrix);
             glClear(GL_DEPTH_BUFFER_BIT);
         }
     }
@@ -145,6 +179,23 @@ void Tema1::Update(float deltaTimeSeconds)
 
                 // Destroy terrain
                 terrain::Terrain::destroyTerrain(terrainCoordinates, projectile->getCenterPosition().x);
+
+                continue;
+            }
+
+            // Handle collision with enemy tank
+            // Check if projectile gets inside enemy hitbox
+            int enemyId = 1 - projectile->getIdAtacker();
+            tanks::Tank *enemyTank = tanks[enemyId];
+            glm::vec2 enemyCenter = enemyTank->getCenterPosition();
+
+            if (pow(projectile->getCenterPosition().x - enemyCenter.x, 2) +
+                    pow(projectile->getCenterPosition().y - enemyCenter.y, 2) < pow(TANK_COLLISION_RADIUS, 2)) {
+                projectile->setOnScreen(false);
+                projectile->setTimeToLive(PROJECTILE_TTL);
+
+                // Decrease enemy health
+                enemyTank->getHealthBar()->setHealth(enemyTank->getHealthBar()->getHealth() - 30);
 
                 continue;
             }
@@ -273,6 +324,7 @@ void Tema1::OnKeyPress(int key, int mods)
 
             if (!projectile->isOnScreen()) {
                 projectile->setOnScreen(true);
+                projectile->setIdAtacker(0);
                 projectile->setTimeToLive(PROJECTILE_TTL);
 
                 tanks::Tank *tank = tanks[0];
@@ -295,6 +347,7 @@ void Tema1::OnKeyPress(int key, int mods)
 
             if (!projectile->isOnScreen()) {
                 projectile->setOnScreen(true);
+                projectile->setIdAtacker(1);
                 projectile->setTimeToLive(PROJECTILE_TTL);
 
                 tanks::Tank *tank = tanks[1];

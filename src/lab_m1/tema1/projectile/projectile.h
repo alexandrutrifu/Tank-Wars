@@ -57,11 +57,15 @@ namespace projectile {
             glm::vec2 getMovementVector() const;
             void setMovementVector(glm::vec2 movementVector);
 
+            int getIdAtacker() const;
+            void setIdAtacker(int idAtacker);
+
         private:
             Mesh *projectileModel{};
             glm::vec2 centerPosition{};
             bool onScreen = false;
             float timeToLive = PROJECTILE_TTL;
+            int idAtacker;
 
             glm::vec2 movementVector{};
     };

@@ -69,3 +69,11 @@ glm::vec2 projectile::Projectile::getMovementVector() const {
 void projectile::Projectile::setMovementVector(glm::vec2 movementVector) {
     projectile::Projectile::movementVector = movementVector;
 }
+
+int projectile::Projectile::getIdAtacker() const{
+    return idAtacker;
+}
+
+void projectile::Projectile::setIdAtacker(int idAtacker) {
+    projectile::Projectile::idAtacker = idAtacker;
+}

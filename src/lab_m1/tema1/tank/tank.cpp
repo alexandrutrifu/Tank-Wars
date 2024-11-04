@@ -27,7 +27,7 @@ tanks::Tank *tanks::Tank::CreateTankModel(const std::string &name, glm::vec3 lef
     return tank;
 }
 
-glm::mat3 tanks::Tank::getRenderMatrix(Mesh *tankPart, float turretAngle, std::vector<glm::vec3> terrainCoordinates) {
+glm::mat3 tanks::Tank::getRenderMatrix(Mesh *tankPart, std::vector<glm::vec3> terrainCoordinates) {
     glm::mat3 modelMatrix = glm::mat3(1);
 
     // Get portion of terrain that is under the tank
@@ -91,6 +91,13 @@ float tanks::Tank::getTankY(std::vector<glm::vec3> terrainCoordinates, int terra
     
     return terrainCoordinates[terrainSegmentIndex].y + temp *
         (terrainCoordinates[terrainSegmentIndex + 1].y - terrainCoordinates[terrainSegmentIndex].y);
+}
+
+glm::vec2 tanks::Tank::computeProjectileStartPos() {
+    float distance = TANK_TURRET_HEIGHT * TANK_TURRET_SCALE_FACTOR + 1.5 * PROJECTILE_OFFSET;
+
+    return glm::vec2(this->getTurretPosition().x + distance * cos(this->getTurretAngle() + this->getTankAngle()),
+                     this->getTurretPosition().y + distance * sin(this->getTurretAngle() + this->getTankAngle()));
 }
 
 float tanks::Tank::getTurretAngle() const

@@ -6,6 +6,7 @@
 #include "../transform.h"
 #include "../objects/objects.h"
 #include "../terrain/terrain.h"
+#include "../projectile/projectile.h"
 #include "math.h"
 
 #include <vector>
@@ -28,13 +29,16 @@ namespace tanks {
             static tanks::Tank *CreateTankModel(const std::string &name, glm::vec3 leftBottomCorner);
 
             // Builds Render Matrix
-            glm::mat3 getRenderMatrix(Mesh *tankPart, float turretAngle, std::vector<glm::vec3> terrainCoordinates);
+            glm::mat3 getRenderMatrix(Mesh *tankPart, std::vector<glm::vec3> terrainCoordinates);
 
             // Get the tank parts
             std::vector<Mesh *> getTankParts() const;
 
             // Get the tank y position
             float getTankY(std::vector<glm::vec3> terrainCoordinates, int terrainSegmentIndex);
+
+            // Compute turret end position
+            glm::vec2 computeProjectileStartPos();
 
             float getTurretAngle() const;
             void setTurretAngle(float angle);

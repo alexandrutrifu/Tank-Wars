@@ -37,12 +37,30 @@ void Tema1::Init()
         AddMeshToList(square);
     }
 
-    // Initialize tank model
-    tanks::Tank *tank = tanks::Tank::CreateTankModel("tank", corner);
+    // Initialize tank models
+    tanks::Tank *tankA = tanks::Tank::CreateTankModel("tankA", corner, tanks::tankA_body_colour,
+            tanks::tankA_base_colour, tanks::tankA_turret_colour);
+    tanks::Tank *tankB = tanks::Tank::CreateTankModel("tankB", corner, tanks::tankB_body_colour,
+            tanks::tankB_base_colour, tanks::tankB_turret_colour);
 
-    tanks.push_back(tank);
+    // Set tankA initial position
+    tankA->setCenterPosition(500, 700);
+    tankA->setTurretPosition(500, 700 + TANK_BASE_HEIGHT + DOME_CENTER_Y);
+    tankA->setTurretAngle(glm::radians(30.0f));
 
-    for (auto &tankPart : tank->getTankParts()) {
+    // Set tankB initial position
+    tankB->setCenterPosition(2000, 700);
+    tankB->setTurretPosition(1000, 700 + TANK_BASE_HEIGHT + DOME_CENTER_Y);
+    tankB->setTurretAngle(glm::radians(150.0f));
+
+    tanks.push_back(tankA);
+    tanks.push_back(tankB);
+
+    for (auto &tankPart : tankA->getTankParts()) {
+        AddMeshToList(tankPart);
+    }
+
+    for (auto &tankPart : tankB->getTankParts()) {
         AddMeshToList(tankPart);
     }
 
@@ -159,7 +177,8 @@ void Tema1::FrameEnd()
 
 void Tema1::OnInputUpdate(float deltaTime, int mods)
 {
-    if (window->KeyHold(GLFW_KEY_W)) {
+    // Tank A
+    if (window->KeyHold(GLFW_KEY_S)) {
         // Rotate turret -> left
         tanks::Tank *tank = tanks[0];
 
@@ -168,7 +187,8 @@ void Tema1::OnInputUpdate(float deltaTime, int mods)
         }
     }
 
-    if (window->KeyHold(GLFW_KEY_S)) {
+    // Tank A
+    if (window->KeyHold(GLFW_KEY_W)) {
         // Rotate turret -> right
         tanks::Tank *tank = tanks[0];
 
@@ -177,25 +197,63 @@ void Tema1::OnInputUpdate(float deltaTime, int mods)
         }
     }
 
+    // Tank B
+    if (window->KeyHold(GLFW_KEY_DOWN)) {
+        // Rotate turret -> left
+        tanks::Tank *tank = tanks[1];
+
+        if (tank->getTurretAngle() < glm::radians(150.0f)) {
+            tank->setTurretAngle(tank->getTurretAngle() + deltaTime);
+        }
+    }
+
+    // Tank B
+    if (window->KeyHold(GLFW_KEY_UP)) {
+        // Rotate turret -> right
+        tanks::Tank *tank = tanks[1];
+
+        if (tank->getTurretAngle() > glm::radians(30.0f)) {
+            tank->setTurretAngle(tank->getTurretAngle() - deltaTime);
+        }
+    }
+
+    // Tank A
     if (window->KeyHold(GLFW_KEY_A)) {
         // Move tank -> left
         tanks::Tank *tank = tanks[0];
         glm::vec2 centerPosition = tank->getCenterPosition();
         glm::vec2 turretPosition = tank->getTurretPosition();
 
-        // Limit movement to terrain
-        // if (centerPosition.y > 0) {
-        //     tank->setCenterPosition(centerPosition.x - 100 * deltaTime, centerPosition.y);
-        //     tank->setTurretPosition(turretPosition.x - 100 * deltaTime, turretPosition.y);
-        // }
+        tank->setCenterPosition(centerPosition.x - 100 * deltaTime, centerPosition.y);
+        tank->setTurretPosition(turretPosition.x - 100 * deltaTime, turretPosition.y);
+    }
+
+    // Tank A
+    if (window->KeyHold(GLFW_KEY_D)) {
+        // Move tank -> right
+        tanks::Tank *tank = tanks[0];
+        glm::vec2 centerPosition = tank->getCenterPosition();
+        glm::vec2 turretPosition = tank->getTurretPosition();
+
+        tank->setCenterPosition(centerPosition.x + 100 * deltaTime, centerPosition.y);
+        tank->setTurretPosition(turretPosition.x + 100 * deltaTime, turretPosition.y);
+    }
+
+    // Tank B
+    if (window->KeyHold(GLFW_KEY_LEFT)) {
+        // Move tank -> left
+        tanks::Tank *tank = tanks[1];
+        glm::vec2 centerPosition = tank->getCenterPosition();
+        glm::vec2 turretPosition = tank->getTurretPosition();
 
         tank->setCenterPosition(centerPosition.x - 100 * deltaTime, centerPosition.y);
         tank->setTurretPosition(turretPosition.x - 100 * deltaTime, turretPosition.y);
     }
 
-    if (window->KeyHold(GLFW_KEY_D)) {
+    // Tank B
+    if (window->KeyHold(GLFW_KEY_RIGHT)) {
         // Move tank -> right
-        tanks::Tank *tank = tanks[0];
+        tanks::Tank *tank = tanks[1];
         glm::vec2 centerPosition = tank->getCenterPosition();
         glm::vec2 turretPosition = tank->getTurretPosition();
 
@@ -207,6 +265,7 @@ void Tema1::OnInputUpdate(float deltaTime, int mods)
 
 void Tema1::OnKeyPress(int key, int mods)
 {
+    // Projectiles for tank A
     if (key == GLFW_KEY_SPACE) {
         // Fire projectile
         for (int index = 0; index < PROJECTILE_POOL_SIZE; index++) {
@@ -217,6 +276,28 @@ void Tema1::OnKeyPress(int key, int mods)
                 projectile->setTimeToLive(PROJECTILE_TTL);
 
                 tanks::Tank *tank = tanks[0];
+                glm::vec2 turretEndPosition = tank->computeProjectileStartPos();
+
+                projectile->setCenterPosition(turretEndPosition.x, turretEndPosition.y);
+                projectile->setMovementVector(glm::vec2(INITIAL_MAGNITUDE * cos(tank->getTurretAngle() + tank->getTankAngle()),
+                                                        INITIAL_MAGNITUDE * sin(tank->getTurretAngle() + tank->getTankAngle())));
+
+                break;
+            }
+        }
+    }
+
+    // Projectiles for tank B
+    if (key == GLFW_KEY_ENTER) {
+        // Fire projectile
+        for (int index = 0; index < PROJECTILE_POOL_SIZE; index++) {
+            projectile::Projectile *projectile = projectiles[index];
+
+            if (!projectile->isOnScreen()) {
+                projectile->setOnScreen(true);
+                projectile->setTimeToLive(PROJECTILE_TTL);
+
+                tanks::Tank *tank = tanks[1];
                 glm::vec2 turretEndPosition = tank->computeProjectileStartPos();
 
                 projectile->setCenterPosition(turretEndPosition.x, turretEndPosition.y);

@@ -5,11 +5,14 @@ tanks::Tank::Tank() = default;
 
 tanks::Tank::~Tank() = default;
 
-tanks::Tank *tanks::Tank::CreateTankModel(const std::string &name, glm::vec3 leftBottomCorner) {
+tanks::Tank *tanks::Tank::CreateTankModel(const std::string &name, glm::vec3 leftBottomCorner,
+                const glm::vec3 &tank_body_colour, const glm::vec3 &tank_base_colour,
+                const glm::vec3 &tank_turret_colour) {
     tanks::Tank *tank = new tanks::Tank();
 
     // Create tank base + body + dome
-    Mesh *tankNoTurret = objects::CreateTank(name + "_body", leftBottomCorner);
+    Mesh *tankNoTurret = objects::CreateTank(name + "_body", leftBottomCorner,
+        tank_body_colour, tank_base_colour);
 
     // Create tank turret
     Mesh *tankTurret = objects::CreateSquare(name + "_turret", leftBottomCorner,
@@ -18,11 +21,6 @@ tanks::Tank *tanks::Tank::CreateTankModel(const std::string &name, glm::vec3 lef
     // Add tank parts to object vector (in the order they should be rendered)
     tank->tankParts.push_back(tankTurret);
     tank->tankParts.push_back(tankNoTurret);
-
-    // Set tank initial position
-    tank->setCenterPosition(500, 700);
-    tank->setTurretPosition(500, 700 + TANK_BASE_HEIGHT + DOME_CENTER_Y);
-    tank->setTurretAngle(glm::radians(30.0f));
 
     return tank;
 }

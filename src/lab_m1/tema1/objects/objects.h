@@ -40,10 +40,6 @@
 #define START_POS_Y_1 500
 
 
-extern const glm::vec3 tank_base_colour;
-extern const glm::vec3 tank_body_colour;
-extern const glm::vec3 tank_turret_colour;
-
 namespace objects {
     // Create square with given bottom left corner, length and color
     Mesh *CreateSquare(const std::string &name, glm::vec3 leftBottomCorner,
@@ -62,7 +58,8 @@ namespace objects {
                 float length, float height, glm::vec3 color, bool fill = false);\
     
     // Create tank model
-    Mesh *CreateTank(const std::string &name, glm::vec3 leftBottomCorner);
+    Mesh *CreateTank(const std::string &name, glm::vec3 leftBottomCorner,
+                const glm::vec3 &tank_body_colour, const glm::vec3 &tank_turret_colour);
                 
 }
 

@@ -1,10 +1,6 @@
 #include "objects.h"
 
 
-const glm::vec3 tank_base_colour = glm::vec3(0.451, 0.392, 0.306);
-const glm::vec3 tank_body_colour = glm::vec3(0.796, 0.686, 0.533);
-const glm::vec3 tank_turret_colour = glm::vec3(0.227, 0.227, 0.235);
-
 Mesh *objects::CreateSquare(const std::string &name, glm::vec3 leftBottomCorner,
                 float length, glm::vec3 color, bool fill) {
     glm::vec3 corner = leftBottomCorner;
@@ -119,7 +115,8 @@ Mesh *objects::CreateTrapezoid(const std::string &name, glm::vec3 leftBottomCorn
     return trapezoid;
 }
 
-Mesh *objects::CreateTank(const std::string &name, glm::vec3 leftBottomCorner) {
+Mesh *objects::CreateTank(const std::string &name, glm::vec3 leftBottomCorner,
+                const glm::vec3 &tank_body_colour, const glm::vec3 &tank_base_colour) {
     /* Vertices 0, 1, 2, 3 -> tank body */
     /* Vertices 4, 5, 6, 7 -> tank base */
     /* Vertices 8 .. 8 + vertexCount -> tank dome */

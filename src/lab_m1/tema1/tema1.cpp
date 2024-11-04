@@ -46,10 +46,14 @@ void Tema1::Init()
         AddMeshToList(tankPart);
     }
 
-    // Start round
-    roundStart = true;
+    // Initialize projectile pool
+    for (int index = 0; index < PROJECTILE_POOL_SIZE; index++) {
+        projectile::Projectile *projectile = projectile::Projectile::CreateProjectileModel("projectile" + std::to_string(index));
+        
+        projectiles.push_back(projectile);
+        AddMeshToList(projectile->getProjectileModel());
+    }
 }
-
 
 void Tema1::FrameStart()
 {
@@ -92,7 +96,7 @@ void Tema1::Update(float deltaTimeSeconds)
 
     glClear(GL_DEPTH_BUFFER_BIT);
 
-    // Tank rendering
+    // Render tanks
     for (auto &tank : tanks) {
         for (auto &tankPart : tank->getTankParts()) {
             glm::mat3 modelMatrix = glm::mat3(1);
@@ -100,6 +104,20 @@ void Tema1::Update(float deltaTimeSeconds)
             modelMatrix *= tank->getRenderMatrix(tankPart, tank->getTurretAngle(), terrainCoordinates);
 
             RenderMesh2D(tankPart, shaders["VertexColor"], modelMatrix);
+            glClear(GL_DEPTH_BUFFER_BIT);
+        }
+    }
+
+    // Render projectiles
+    for (int index = 0; index < PROJECTILE_POOL_SIZE; index++) {
+        projectile::Projectile *projectile = projectiles[index];
+
+        if (projectile->isOnScreen()) {
+            glm::mat3 modelMatrix = glm::mat3(1);
+
+            // modelMatrix *= projectile->getRenderMatrix(projectile->getProjectileModel(), 0, terrainCoordinates);
+
+            // RenderMesh2D(projectile->getProjectileModel(), shaders["VertexColor"], modelMatrix);
             glClear(GL_DEPTH_BUFFER_BIT);
         }
     }

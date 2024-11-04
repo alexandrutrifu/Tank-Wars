@@ -9,9 +9,10 @@
 #include <iostream>
 
 #include "lab_m1/tema1/transform.h"
-#include "lab_m1/tema1/terrain.h"
+#include "lab_m1/tema1/terrain/terrain.h"
 #include "lab_m1/tema1/objects/objects.h"
 #include "lab_m1/tema1/tank/tank.h"
+#include "lab_m1/tema1/projectile/projectile.h"
 
 
 namespace m1
@@ -52,9 +53,7 @@ namespace m1
         std::vector<glm::vec3> terrainCoordinates{};
 
         std::vector<tanks::Tank *> tanks{};
-
-        bool roundStart{};
-
+        std::vector<projectile::Projectile *> projectiles{};
     };
 }   // namespace m1
 

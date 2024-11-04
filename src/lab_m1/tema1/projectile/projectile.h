@@ -18,6 +18,9 @@
 #include "utils/glm_utils.h"
 
 #define PROJECTILE_POOL_SIZE 10
+#define PROJECTILE_RADIUS 8
+#define PROJECTILE_OFFSET (PROJECTILE_RADIUS * 2)
+#define PROJECTILE_TTL 5    // seconds
 
 extern const glm::vec3 projectile_colour;
 extern const glm::vec3 projectile_inactive_position;
@@ -32,13 +35,7 @@ namespace projectile {
             static projectile::Projectile *CreateProjectileModel(const std::string &name);
 
             // Builds Render Matrix
-            glm::mat3 getRenderMatrix(Mesh *projectilePart, float angle, std::vector<glm::vec3> terrainCoordinates);
-
-            // Get the projectile parts
-            std::vector<Mesh *> getProjectileParts() const;
-
-            // Get the projectile y position
-            float getProjectileY(std::vector<glm::vec3> terrainCoordinates, int terrainSegmentIndex);
+            glm::mat3 getRenderMatrix();
 
             glm::vec2 getCenterPosition() const;
             void setCenterPosition(float x, float y);
@@ -48,10 +45,14 @@ namespace projectile {
             bool isOnScreen() const;
             void setOnScreen(bool onScreen);
 
+            float getTimeToLive() const;
+            void setTimeToLive(float ttl);
+
         private:
             Mesh *projectileModel{};
             glm::vec2 centerPosition{};
             bool onScreen = false;
+            float timeToLive = PROJECTILE_TTL;
     };
 }
 

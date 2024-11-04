@@ -133,6 +133,7 @@ void Tema1::Update(float deltaTimeSeconds)
     for (auto &tank : tanks) {
         // Check if tank has been destroyed
         if (tank->getHealthBar()->getHealth() <= 0) {
+            tank->setCenterPosition(-1, -1);
             continue;
         }
 

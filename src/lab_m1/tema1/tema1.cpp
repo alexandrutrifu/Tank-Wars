@@ -53,6 +53,13 @@ void Tema1::Init()
     tankB->setTurretPosition(1000, 700 + TANK_BASE_HEIGHT + DOME_CENTER_Y);
     tankB->setTurretAngle(glm::radians(150.0f));
 
+    // Add trajectories
+    tankA->setTrajectory(new tanks::Trajectory());
+    tankB->setTrajectory(new tanks::Trajectory());
+
+    tankA->getTrajectory()->initTrajectoryVertices();
+    tankB->getTrajectory()->initTrajectoryVertices();
+
     tanks.push_back(tankA);
     tanks.push_back(tankB);
 
@@ -92,6 +99,10 @@ void Tema1::FrameStart()
 {
     // Clears the color buffer (using the previously set color) and depth buffer
     glEnable(GL_DEPTH_TEST);
+    // Enable line smoothing and blending
+    glEnable(GL_LINE_SMOOTH);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glDepthFunc(GL_LESS);
     glClearColor(skyBlue.x, skyBlue.y, skyBlue.z, 1);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -104,6 +115,33 @@ void Tema1::FrameStart()
 
 void Tema1::Update(float deltaTimeSeconds)
 {
+    for (int i = 1; i < terrainCoordinates.size() - 1; ++i) {
+        glm::vec3* pointLeft = terrainCoordinates[i - 1];
+        glm::vec3* point = terrainCoordinates[i];
+        glm::vec3* pointRight = terrainCoordinates[i + 1];
+
+        // Calculate the slope differences between adjacent points
+        float slopeLeft = point->y - pointLeft->y;
+        float slopeRight = point->y - pointRight->y;
+
+        // Landslide adjustment if slope exceeds threshold
+        if (slopeLeft > LANDSLIDE_THRESHOLD) {
+            float adjustment = (slopeLeft - LANDSLIDE_THRESHOLD) * LANDSLIDE_EPSILON * deltaTimeSeconds;
+            point->y -= adjustment;
+            pointLeft->y += adjustment * 0.5f; // Half adjustment for neighboring points
+        }
+
+        if (slopeRight > LANDSLIDE_THRESHOLD) {
+            float adjustment = (slopeRight - LANDSLIDE_THRESHOLD) * LANDSLIDE_EPSILON * deltaTimeSeconds;
+            point->y -= adjustment;
+            pointRight->y += adjustment * 0.5f;
+        }
+    }
+
+    for (int i = 1; i < terrainCoordinates.size() - 1; ++i) {
+        terrainCoordinates[i]->y = (terrainCoordinates[i - 1]->y + terrainCoordinates[i]->y + terrainCoordinates[i + 1]->y) / 3.0f;
+    }
+
     // Render terrain
     for (int startIndex = 0; startIndex < terrainCoordinates.size() - 1; startIndex++) {
         glm::vec3 *pointA = terrainCoordinates[startIndex];
@@ -159,6 +197,44 @@ void Tema1::Update(float deltaTimeSeconds)
             RenderMesh2D(healthBarPart, shaders["VertexColor"], modelMatrix);
             glClear(GL_DEPTH_BUFFER_BIT);
         }
+
+        // Render trajectory
+        tanks::Trajectory *trajectory = tank->getTrajectory();
+        glm::vec2 startTrajectory = tank->computeProjectileStartPos();
+
+        float angle = tank->getTankAngle() + tank->getTurretAngle();
+        glm::vec2 currentPosition = tank->computeProjectileStartPos();
+        glm::vec2 movementVector = glm::vec2(INITIAL_MAGNITUDE * cos(angle),
+                                            INITIAL_MAGNITUDE * sin(angle));
+
+        for (int index = 0; index < TRAJECTORY_VERTEX_COUNT; index++) {
+            if (currentPosition.x < 0 || currentPosition.x > window->GetResolution().x) {
+                break;
+            }
+
+            float yUnder =
+                terrain::Terrain::getCorrespondingY(terrainCoordinates,
+                        terrain::Terrain::getTerrainSegmentIndex(currentPosition.x),
+                        currentPosition.x);
+
+            if (currentPosition.y - yUnder < 40) {
+                break;
+            }
+
+            glm::mat3 modelMatrix = glm::mat3(1);
+
+            modelMatrix *= transform::Translate(currentPosition.x + movementVector.x * deltaTimeSeconds * 0.1f,
+                                                currentPosition.y + movementVector.y * deltaTimeSeconds * 0.1f);
+            modelMatrix *= transform::Translate(2, 2);
+            
+
+            RenderMesh2D(tank->getTrajectory()->getTrajectoryVertices()[index], shaders["VertexColor"], modelMatrix);
+
+            currentPosition += movementVector * deltaTimeSeconds * 0.1f;
+            movementVector += projectile::gAcceleration * deltaTimeSeconds * 0.1f;
+
+            glClear(GL_DEPTH_BUFFER_BIT);
+        }
     }
 
     // Render projectiles
@@ -180,6 +256,9 @@ void Tema1::Update(float deltaTimeSeconds)
 
                 // Destroy terrain
                 terrain::Terrain::destroyTerrain(terrainCoordinates, projectile->getCenterPosition().x);
+
+                // Check for landslide
+
 
                 continue;
             }

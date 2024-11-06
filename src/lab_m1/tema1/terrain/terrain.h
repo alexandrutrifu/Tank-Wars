@@ -17,6 +17,8 @@
 #include "utils/glm_utils.h"
 
 #define SEGMENT_SIZE 1
+#define LANDSLIDE_THRESHOLD 1
+#define LANDSLIDE_EPSILON 2
 
 #define COLLISION_RADIUS 64
 

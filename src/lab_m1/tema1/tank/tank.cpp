@@ -150,3 +150,11 @@ healthBar::HealthBar *tanks::Tank::getHealthBar() const{
 void tanks::Tank::setHealthBar(healthBar::HealthBar *healthBar){
     this->healthBar = healthBar;
 }
+
+tanks::Trajectory *tanks::Tank::getTrajectory() const {
+    return trajectory;
+}
+
+void tanks::Tank::setTrajectory(tanks::Trajectory *trajectory) {
+    this->trajectory = trajectory;
+}

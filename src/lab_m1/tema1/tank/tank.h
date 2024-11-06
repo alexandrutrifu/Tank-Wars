@@ -18,6 +18,8 @@
 #include "components/simple_scene.h"
 #include "utils/glm_utils.h"
 
+#define TRAJECTORY_VERTEX_COUNT 1000
+
 
 namespace healthBar {
     const glm::vec3 health_bar_colour = glm::vec3(1, 1, 1);
@@ -54,6 +56,28 @@ namespace tanks {
     const glm::vec3 tankB_base_colour = glm::vec3(0.349, 0.392, 0.2);
     const glm::vec3 tankB_body_colour = glm::vec3(0.698, 0.796, 0.545);
     const glm::vec3 tankB_turret_colour = glm::vec3(0.227, 0.227, 0.235);
+
+    const glm::vec3 trajectory_colour = glm::vec3(1.0, 1.0, 1.0);
+
+    class Trajectory {
+        public:
+            Trajectory();
+            ~Trajectory();
+
+            // Initialize trajectory vertex-vector
+            void initTrajectoryVertices();
+
+            // Update trajectory vertex-vector
+            void updateTrajectoryVertices(glm::vec2 startPosition, float tankAngle);
+
+            std::vector<Mesh *> getTrajectoryVertices() const;
+
+            std::vector<unsigned int> getIndices() const;
+
+        private:
+            std::vector<Mesh *> trajectoryVertices{};
+            std::vector<unsigned int> indices{};
+    };
 
     class Tank {
         public:
@@ -92,9 +116,13 @@ namespace tanks {
             healthBar::HealthBar *getHealthBar() const;
             void setHealthBar(healthBar::HealthBar *healthBar);
 
+            tanks::Trajectory *getTrajectory() const;
+            void setTrajectory(tanks::Trajectory *trajectory);
+
         private:
             std::vector<Mesh *> tankParts{};
             healthBar::HealthBar *healthBar{};
+            tanks::Trajectory *trajectory{};
             glm::vec2 centerPosition{};
             glm::vec2 turretPosition{};
             float turretAngle{};

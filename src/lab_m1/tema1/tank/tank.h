@@ -18,7 +18,7 @@
 #include "components/simple_scene.h"
 #include "utils/glm_utils.h"
 
-#define TRAJECTORY_VERTEX_COUNT 1000
+#define TRAJECTORY_VERTEX_COUNT 2000
 
 
 namespace healthBar {

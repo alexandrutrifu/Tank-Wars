@@ -223,15 +223,13 @@ void Tema1::Update(float deltaTimeSeconds)
 
             glm::mat3 modelMatrix = glm::mat3(1);
 
-            modelMatrix *= transform::Translate(currentPosition.x + movementVector.x * deltaTimeSeconds * 0.1f,
-                                                currentPosition.y + movementVector.y * deltaTimeSeconds * 0.1f);
+            modelMatrix *= transform::Translate(currentPosition.x, currentPosition.y);
             modelMatrix *= transform::Translate(2, 2);
-            
 
             RenderMesh2D(tank->getTrajectory()->getTrajectoryVertices()[index], shaders["VertexColor"], modelMatrix);
 
-            currentPosition += movementVector * deltaTimeSeconds * 0.1f;
-            movementVector += projectile::gAcceleration * deltaTimeSeconds * 0.1f;
+            currentPosition += movementVector * 0.001f;
+            movementVector += projectile::gAcceleration * 0.001f;
 
             glClear(GL_DEPTH_BUFFER_BIT);
         }
